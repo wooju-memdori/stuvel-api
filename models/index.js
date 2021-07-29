@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const path = require('path');
+const autoIncrement = require('mongoose-auto-increment');
 
 dotenv.config({
   path: path.resolve(
@@ -14,7 +15,7 @@ const connect = () => {
     mongoose.set('debug', true);
   }
 
-  mongoose.connect(
+  const connected = mongoose.connect(
     process.env.mongoURI,
     {
       dbName: 'nodejs',
@@ -39,5 +40,7 @@ mongoose.connection.on('disconnected', () => {
   console.log('몽고db 연결이 끊어졌습니다. 연결을 재시도합니다.');
   connect();
 });
+
+autoIncrement.initialize(mongoose.connection);
 
 module.exports = connect;

@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const autoIncrement = require('mongoose-auto-increment');
 
 const { Schema } = mongoose;
+
 const user = new Schema({
   seq: {
     type: Number,
@@ -40,11 +41,11 @@ const user = new Schema({
   },
 });
 
+module.exports = mongoose.model('User', user);
+
 user.plugin(autoIncrement.plugin, {
   model: 'User',
   field: 'seq',
   startAt: 1, // 시작
   increment: 1, // 증가
 });
-
-module.exports = mongoose.model('User', user);
