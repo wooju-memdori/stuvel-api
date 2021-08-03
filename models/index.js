@@ -16,8 +16,8 @@ const connect = () => {
 
     mongoose.connect(process.env.mongoURI, {
         dbName: 'nodejs',
-        uesNewUrlParser: true,
-        useCreateIndex: true,
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
     }, (error) => {
         if (error) {
             console.log('몽고db 연결 에러', error);
