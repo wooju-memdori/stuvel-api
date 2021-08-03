@@ -3,13 +3,14 @@ const http = require('http');
 // const server = http.Server(app);
 const server = http.createServer(app);
 const io = require("socket.io")(server);
+const room = io.of('room');
 
 const port = 3000;
 app.set('port', port);
 
 
 
-io.on("connection", (socket) => {
+room.on("connection", (socket) => {
     socket.on("join-room", (roomId, userId) => {
       console.log("roomId", roomId, "userId", userId);
       socket.join(roomId);

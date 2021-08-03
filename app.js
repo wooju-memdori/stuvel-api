@@ -2,8 +2,8 @@ const express = require('express');
 const path = require('path');
 const connect = require('./models');
 const morgan = require('morgan');
-const { v4: uuidV4 } = require("uuid");
 const indexRouter = require('./routes');
+const roomRouter = require('./routes/room');
 
 const app = express();
 connect();
@@ -16,6 +16,7 @@ app.set("view engine", "ejs");
 
 // 라우터
 app.use('/', indexRouter);
+app.use('/room', roomRouter)
 
 app.use((req, res, next) => {
     const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);
