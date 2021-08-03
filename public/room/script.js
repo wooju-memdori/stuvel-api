@@ -20,7 +20,6 @@ navigator.mediaDevices
   // MediaStream 객체로 이행하는 Promise
   .getUserMedia({
     video: true,
-    audio: true,
   })
   // stream 사용
   .then((stream) => {

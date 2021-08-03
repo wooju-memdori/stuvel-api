@@ -8,20 +8,15 @@ const rooms = [];
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 
-/*
 app.get("/room", (req, res) => {
-  // 홈페이지로 갈 때마다 랜덤한 uuid(roomId) 생성
-  res.redirect(`${uuidV4()}`);
+  res.redirect("/room/" + uuidV4());
 });
-*/
 
 app.get("/room/:room", (req, res) => {
   res.render("room", { roomId: req.params.room });
 });
 
 app.get("/", (req, res) => {
-  const roomId = uuidV4();
-  rooms.push(roomId);
   res.render("home", { roomId });
 });
 
