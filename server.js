@@ -20,7 +20,9 @@ app.get("/", (req, res) => {
   res.render("home", { roomId });
 });
 
-io.on("connection", (socket) => {
+const room = io.of("room");
+
+room.on("connection", (socket) => {
   socket.on("join-room", (roomId, userId) => {
     console.log("roomId", roomId, "userId", userId);
     socket.join(roomId);
