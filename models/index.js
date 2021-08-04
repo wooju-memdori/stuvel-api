@@ -15,7 +15,7 @@ const connect = () => {
     mongoose.set('debug', true);
   }
 
-  const connected = mongoose.connect(
+  mongoose.connect(
     process.env.mongoURI,
     {
       dbName: 'nodejs',
