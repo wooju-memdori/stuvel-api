@@ -1,14 +1,14 @@
-const socket = io("/room");
+const socket = io('/room');
 
-const videoGrid = document.getElementById("video-grid");
+const videoGrid = document.getElementById('video-grid');
 
 // let server to generate own client id
 const myPeer = new Peer(undefined, {
-  host: "/",
-  port: "3001",
+  host: '/',
+  port: '3001',
 });
 
-const myVideo = document.createElement("video");
+const myVideo = document.createElement('video');
 myVideo.muted = true;
 
 const peers = {};
@@ -22,45 +22,45 @@ navigator.mediaDevices
     video: true,
   })
   // stream 사용
-  .then((stream) => {
+  .then(stream => {
     addVideoStream(myVideo, stream);
 
     // receive the call
-    myPeer.on("call", (call) => {
+    myPeer.on('call', call => {
       call.answer(stream);
-      const video = document.createElement("video");
-      call.on("stream", (userVideoStream) => {
+      const video = document.createElement('video');
+      call.on('stream', userVideoStream => {
         addVideoStream(video, userVideoStream);
       });
     });
 
-    socket.on("user-connected", (userId) => {
+    socket.on('user-connected', userId => {
       connectToNewUser(userId, stream);
     });
   });
 
-socket.on("user-disconnected", (userId) => {
+socket.on('user-disconnected', userId => {
   if (peers[userId]) peers[userId].close();
 });
 
 // when connect to peer server and get back id, emit this id and room id
-myPeer.on("open", (id) => {
-  socket.emit("join-room", ROOM_ID, id);
+myPeer.on('open', id => {
+  socket.emit('join-room', ROOM_ID, id);
 });
 
 // make the call when the new user connect to our room
 function connectToNewUser(userId, stream) {
   // call to the user with this userId and give stream to that user
   const call = myPeer.call(userId, stream);
-  const video = document.createElement("video");
+  const video = document.createElement('video');
   // and when they send back their stream,
   // we're gonna get the event called stream
   // userVideoStream: add to the list of the video
-  call.on("stream", (userVideoStream) => {
+  call.on('stream', userVideoStream => {
     addVideoStream(video, userVideoStream);
   });
   // whenever someone leaves the room remove their video
-  call.on("close", () => {
+  call.on('close', () => {
     video.remove();
   });
 
@@ -70,7 +70,7 @@ function connectToNewUser(userId, stream) {
 function addVideoStream(video, stream) {
   // HTMLMediaElement.srcObject : MediaStream
   video.srcObject = stream;
-  video.addEventListener("loadedmetadata", () => {
+  video.addEventListener('loadedmetadata', () => {
     video.play();
   });
   videoGrid.append(video);
