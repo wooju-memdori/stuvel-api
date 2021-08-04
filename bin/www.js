@@ -3,8 +3,13 @@ const http = require('http');
 const socketIO = require('socket.io');
 const app = require('../app');
 
-const server = http.createServer(app);
-const io = socketIO(server);
+const server = http.Server(app);
+const io = socketIO(server, {
+  cors: {
+    origin: '*',
+  },
+});
+// const io = socketIO(server);
 
 const room = io.of('room');
 
