@@ -4,9 +4,15 @@ const http = require('http');
 const server = http.createServer(app);
 const io = require("socket.io")(server);
 const room = io.of('room');
+const { PeerServer } = require('peer');
 
-const port = 3000;
-app.set('port', port);
+const port = {
+  stuvel: 3000,
+  peer: 3001,
+};
+
+app.set('port', port.stuvel);
+const peerServer = PeerServer({ port: port.peer, path: '/' });
 
 
 
@@ -22,6 +28,6 @@ room.on("connection", (socket) => {
     });
   });
 
-server.listen(port, () => {
-    console.log(port, '번 포트에서 대기중')
+server.listen(port.stuvel, () => {
+    console.log(port.stuvel, '번 포트에서 대기중')
 });
