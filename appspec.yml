@@ -8,6 +8,9 @@ files:
 # 현재는 /home/ubuntu/build/ 라는 경로를 지정
 
 hooks:
+  BeforeInstall:
+    - location: scripts/beforeInstall.bash
+      runas: root
   AfterInstall:
     - location: scripts/afterInstall.bash
       runas: root
