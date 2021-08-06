@@ -14,6 +14,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+app.set('view engine', 'ejs');
+
 // 라우터
 app.use('/', indexRouter);
 app.use('/room', roomRouter);
