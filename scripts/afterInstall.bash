@@ -1,5 +1,5 @@
 docker pull hayeon17kim/stuvel-api:v1
-docker run --env-file /home/ubuntu/.env --publish 3000:3000 -it --name stuvel-codedeploy hayeon17kim/stuvel-api:v1 /bin/bash
+docker run --env-file /home/ubuntu/.env --publish 3000:3000 -i --name stuvel-codedeploy hayeon17kim/stuvel-api:v1 /bin/bash
 
 # DockerHub에 있는 Image를 pull하여 EC2 instance로 가져옵니다.
 # 받아온 Image를 Docker Container에 띄워서 가동시킵니다.
