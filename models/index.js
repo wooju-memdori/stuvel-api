@@ -3,6 +3,9 @@ const dotenv = require('dotenv');
 const path = require('path');
 const autoIncrement = require('mongoose-auto-increment');
 
+console.log('process.env : ' + process.env);
+console.log('process.env.NODE_ENV : ' + process.env.NODE_ENV);
+
 dotenv.config({
   path: path.resolve(
     process.cwd(),
