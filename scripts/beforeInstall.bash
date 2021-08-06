@@ -14,7 +14,7 @@ docker rm stuvel-codedeploy
 # [Your Docker Container Name] 예시) woomin-facebook-codedeploy
 
 if [[ "$(docker images -q hayeon17kim/stuvel-api:v1 2> /dev/null)" != "" ]]; then
-docker rmi -f $(docker images --format '{{.Repository}}:{{.Tag}}' --filter=reference='hayeon17kim/stuvelapi:v1')
+docker rmi -f $(docker images --format '{{.Repository}}:{{.Tag}}' --filter=reference='hayeon17kim/stuvel-api:v1')
 fi
 # 해당 Docker Image가 존재하면 image를 제거한다는 뜻입니다.
 # 이후 afterinstall.bash 파일에서 갱신된 이미지를 불러올 것입니다.
