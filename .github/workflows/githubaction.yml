@@ -2,13 +2,13 @@ name: GitHub Action Example
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # master branch로 변경합니다.
+      # main branch로 변경합니다.
       - name: Checkout main
         uses: actions/checkout@main
 
