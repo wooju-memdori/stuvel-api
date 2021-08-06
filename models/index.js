@@ -3,8 +3,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 const autoIncrement = require('mongoose-auto-increment');
 
-console.log('process.env : ' + process.env);
-console.log('process.env.NODE_ENV : ' + process.env.NODE_ENV);
+console.log(process.env.mongoURI);
 
 dotenv.config({
   path: path.resolve(
@@ -12,6 +11,8 @@ dotenv.config({
     process.env.NODE_ENV === 'production' ? '.env' : '.env.dev',
   ),
 });
+
+console.log(process.env.mongoURI);
 
 const connect = () => {
   if (process.env.NODE_ENV !== 'production') {
