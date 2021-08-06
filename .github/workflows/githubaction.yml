@@ -34,8 +34,8 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_ID }}
           password: ${{ secrets.DOCKER_PW }}
-          repository: hayeon17kim/stuvel-api:v1
-          tags: latest
+          repository: hayeon17kim/stuvel-api
+          tags: v1
 
       # Docker Hub에 새로운 Image가 push 완료되면 CodeDeploy Agent가 동작되도록 합니다.
       # --application-name과 --deployment-group-name은 아까 작성하신 애플리케이션 이름과 그룹 이름으로 대체하시면 됩니다.
