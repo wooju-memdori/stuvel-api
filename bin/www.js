@@ -9,6 +9,11 @@ const io = socketIO(server, {
     origin: '*',
   },
 });
+
+const options = {
+  host: '127.0.0.0',
+  port: 3000,
+};
 // const io = socketIO(server);
 
 const room = io.of('room');
@@ -34,6 +39,6 @@ room.on('connection', socket => {
   });
 });
 
-server.listen(port.stuvel, () => {
+server.listen(options, () => {
   console.log(port.stuvel, '번 포트에서 대기중');
 });

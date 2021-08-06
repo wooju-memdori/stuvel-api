@@ -19,7 +19,7 @@ const connect = () => {
     process.env.mongoURI,
     {
       dbName: 'nodejs',
-      uesNewUrlParser: true,
+      useNewUrlParser: true,
       useCreateIndex: true,
     },
     error => {
