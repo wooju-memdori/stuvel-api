@@ -3,10 +3,7 @@ const socket = io('/room');
 const videoGrid = document.getElementById('video-grid');
 
 // let server to generate own client id
-const myPeer = new Peer(undefined, {
-  host: 'https://stuvel.me',
-  port: '3001',
-});
+const myPeer = new Peer();
 
 const myVideo = document.createElement('video');
 myVideo.muted = true;
