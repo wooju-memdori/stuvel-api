@@ -4,7 +4,7 @@ const videoGrid = document.getElementById('video-grid');
 
 // let server to generate own client id
 const myPeer = new Peer(undefined, {
-  host: '/',
+  host: 'https://stuvel.me',
   port: '3001',
 });
 
