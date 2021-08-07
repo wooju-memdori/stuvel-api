@@ -1,4 +1,14 @@
 const http = require('http');
+const path = require('path');
+const dotenv = require('dotenv');
+
+dotenv.config({
+  path: path.resolve(
+    process.cwd(),
+    process.env.NODE_ENV === 'production' ? '.env' : '.env.dev',
+  ),
+});
+
 const app = require('../app');
 
 const port = 3000;

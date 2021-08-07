@@ -19,7 +19,7 @@ const user = new Schema({
     required: true,
     maxlength: 10,
   },
-  gender: Number,
+  gender: Number, // 0: 여성 1: 남성
   password: {
     type: String,
     minlength: 8,

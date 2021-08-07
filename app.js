@@ -8,6 +8,7 @@ const userRouter = require('./routes/users');
 const passportConfig = require('./passport/local');
 
 const app = express();
+
 passportConfig();
 connect();
 app.use(morgan('dev'));
@@ -29,7 +30,7 @@ app.use((err, req, res, next) => {
   res.locals.message = err.message;
   res.locals.error = process.env.NODE_ENV !== 'production' ? err : {};
   res.status(err.status || 500);
-  res.render('error');
+  res.send(err);
 });
 
 module.exports = app;

@@ -1,26 +1,18 @@
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const path = require('path');
 const autoIncrement = require('mongoose-auto-increment');
-
-dotenv.config({
-  path: path.resolve(
-    process.cwd(),
-    process.env.NODE_ENV === 'production' ? '.env' : '.env.dev',
-  ),
-});
 
 const connect = () => {
   if (process.env.NODE_ENV !== 'production') {
     mongoose.set('debug', true);
   }
 
-  const connected = mongoose.connect(
+  mongoose.connect(
     process.env.mongoURI,
     {
       dbName: 'nodejs',
-      uesNewUrlParser: true,
+      useNewUrlParser: true,
       useCreateIndex: true,
+      useUnifiedTopology: true,
     },
     error => {
       if (error) {
