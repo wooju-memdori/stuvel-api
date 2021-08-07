@@ -3,6 +3,10 @@ const path = require('path');
 const connect = require('./models');
 const morgan = require('morgan');
 
+const userRouter = require('./routes/users');
+
+const bodyParser = require('body-parser');
+
 const app = express();
 connect();
 app.use(morgan('dev'))
@@ -22,5 +26,11 @@ app.use((err, req, res, next) => {
     res.status(err.status || 500);
     res.render('error');
 });
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+app.use('/users', userRouter);
+
 
 module.exports = app;
