@@ -3,16 +3,12 @@ const dotenv = require('dotenv');
 const path = require('path');
 const autoIncrement = require('mongoose-auto-increment');
 
-console.log(process.env.mongoURI);
-
 dotenv.config({
   path: path.resolve(
     process.cwd(),
     process.env.NODE_ENV === 'production' ? '.env' : '.env.dev',
   ),
 });
-
-console.log(process.env.mongoURI);
 
 const connect = () => {
   if (process.env.NODE_ENV !== 'production') {
@@ -25,6 +21,7 @@ const connect = () => {
       dbName: 'nodejs',
       useNewUrlParser: true,
       useCreateIndex: true,
+      useUnifiedTopology: true,
     },
     error => {
       if (error) {
