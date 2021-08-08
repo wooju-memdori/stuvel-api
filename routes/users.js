@@ -2,7 +2,8 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const Token = require('../models/Token');
-const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
+const User = require('../models/User');
+const { isNotLoggedIn } = require('./middlewares');
 
 const router = express.Router();
 
@@ -71,6 +72,18 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
     res.send(err);
     next(err);
   }
+});
+
+// 회원 조회 (READ)
+router.get('/user/:nickname', (req, res) => {
+  User.findOne({ nickname: req.params.nickname }, (err, user) => {
+    if (err) return res.status(500).json({ error: err });
+    if (!user)
+      return res
+        .status(404)
+        .json({ error: '해당 닉네임을 가진 유저가 존재하지 않습니다.' });
+    return res.json(user);
+  });
 });
 
 module.exports = router;
