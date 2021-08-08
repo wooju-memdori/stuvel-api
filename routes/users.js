@@ -26,6 +26,18 @@ router.post('/signup', (req, res) => {
 });
 
 
+// 회원 조회 (READ)
+router.get('/user/:nickname', (req, res) => {
+
+    User.findOne({ nickname: req.params.nickname }, function (err, user) {
+        if (err) return res.status(500).json({ error: err });
+        if (!user) return res.status(404).json({ error: '해당 닉네임을 가진 유저가 존재하지 않습니다.' });
+        res.json(user);
+    })
+
+});
+
+
 
 // 회원 삭제 (DELETE)
 router.delete('/delete', (req, res) => {
