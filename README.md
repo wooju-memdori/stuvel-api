@@ -15,3 +15,4 @@ It is not a Live streamming service like "study with me", but "study together" v
 - [ ] Authentication using JWT
 - [ ] Creation and Joining study room
 - [ ] Show current active users
+- [ ] Random room Matching
