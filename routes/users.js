@@ -59,6 +59,7 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
       async (err, user, info) => {
         if (err || !user) {
           res.status(400).json({ message: info.reason });
+          console.log(err);
           return;
         }
         // user 데이터를 통해 로그인 진행
@@ -76,16 +77,21 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
             },
           );
 
-          // DB에 refreshToken 저장
-          const token = new Token({
-            content: refreshToken,
-            userSeq: user.seq,
-          });
+          // DB에 refreshToken가 있으면 업데이트
+          if (Token.findOne({ userSeq: user.seq })) {
+            Token.updateOne({ userSeq: user.seq }, { content: refreshToken });
+            // DB에 refreshToken가 없으면 저장
+          } else {
+            const token = new Token({
+              content: refreshToken,
+              userSeq: user.seq,
+            });
 
-          try {
-            token.save();
-          } catch (error) {
-            res.status(500).json({ error });
+            try {
+              token.save();
+            } catch (error) {
+              res.status(500).json({ error });
+            }
           }
           // accessToken 발급
           const accessToken = jwt.sign(
@@ -95,7 +101,6 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
               expiresIn: '15m',
             },
           );
-          console.log(accessToken);
           // refreshToken 쿠키로 보내고 accessToken json payload로 보내기
           res.cookie('refreshToken', refreshToken, {
             httpOnly: true,

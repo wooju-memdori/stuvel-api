@@ -1,8 +1,10 @@
 const passport = require('passport');
 const { Strategy: LocalStrategy } = require('passport-local');
 const { ExtractJwt, Strategy: JWTStrategy } = require('passport-jwt');
+const { Strategy: CustomStrategy } = require('passport-custom');
 const { createPassword } = require('./crypto');
 const User = require('../models/User');
+const Token = require('../models/Token');
 
 // {"email": "chanyeong", "password": "password"}
 // mongoose 조회 기능 살펴보기!!
@@ -42,13 +44,13 @@ const passportVerify = async (email, password, done) => {
 };
 
 // jwt 인증 config
-const JWTConfig = {
+const accessTokenConfig = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // 헤더의 authorization에서 jwt 가져오기
   secretOrKey: process.env.JWT_SECRET,
 };
 
-// jwt 인증 strategy
-const JWTVerify = async (jwtPayload /* 토큰의 데이터 부분 */, done) => {
+// accessToken 인증 strategy
+const accessTokenVerify = async (jwtPayload /* 토큰의 데이터 부분 */, done) => {
   try {
     // payload의 id값으로 유저의 데이터 조회
     const user = await User.findOne({ seq: jwtPayload.userSeq });
@@ -58,14 +60,37 @@ const JWTVerify = async (jwtPayload /* 토큰의 데이터 부분 */, done) => {
       return;
     }
     // 유저 데이터가 없을 경우 에러 표시
-    done(null, false, { reason: '올바르지 않은 인증정보 입니다.' });
+    done(null, false, { reason: '올바르지 않은 accessToken 입니다.' });
   } catch (error) {
     console.error(error);
     done(error);
   }
 };
 
+// refreshToken 인증 strategy
+const refreshTokenVerify = async (req, done) => {
+  if (!req.cookies.refreshToken) {
+    console.log('refreshToken 없음');
+    done(null, false, { reason: '올바르지 않은 refreshToken 입니다.' });
+    return;
+  }
+  const refreshToken = await Token.findOne({
+    content: req.cookies.refreshToken,
+  });
+  if (!refreshToken) {
+    console.log('올바르지 않은 refreshToken');
+    done(null, false, { reason: '올바르지 않은 refreshToken 입니다.' });
+    return;
+  }
+  const user = await User.findOne({ seq: refreshToken.userSeq });
+  done(null, user);
+};
+
 module.exports = () => {
-  passport.use('jwt', new JWTStrategy(JWTConfig, JWTVerify));
+  passport.use(
+    'accessToken',
+    new JWTStrategy(accessTokenConfig, accessTokenVerify),
+  );
+  passport.use('refreshToken', new CustomStrategy(refreshTokenVerify));
   passport.use('local', new LocalStrategy(passportConfig, passportVerify));
 };

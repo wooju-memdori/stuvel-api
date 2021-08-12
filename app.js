@@ -2,11 +2,16 @@ const express = require('express');
 const path = require('path');
 const morgan = require('morgan');
 const passport = require('passport');
+const cookieParser = require('cookie-parser');
 const connect = require('./models');
 const indexRouter = require('./routes');
 const userRouter = require('./routes/users');
 const passportConfig = require('./passport');
-const { jwtAuthenticater } = require('./routes/middlewares');
+const {
+  accessTokenAuthenticater,
+  refreshTokenAuthenticater,
+  isNotLoggedIn,
+} = require('./routes/middlewares');
 
 const app = express();
 
@@ -26,11 +31,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// cookie-parser
+app.use(cookieParser());
+
 // req 객체에 passport 설정 심기
 app.use(passport.initialize());
 
-// jwt 인증 미들웨어
-app.use(jwtAuthenticater);
+// accessToken 인증 미들웨어
+app.use(accessTokenAuthenticater);
+// refreshToken 인증 미들웨어
+app.use(refreshTokenAuthenticater);
 
 // 라우터 미들웨어
 app.use('/', indexRouter);
