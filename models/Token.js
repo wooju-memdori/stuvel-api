@@ -13,7 +13,7 @@ const token = new Schema({
     unique: true,
     required: true,
   },
-  userId: {
+  userSeq: {
     type: Number,
     unique: true,
     required: true,

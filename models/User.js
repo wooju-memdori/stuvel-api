@@ -23,7 +23,6 @@ const user = new Schema({
   password: {
     type: String,
     required: true,
-    minlength: 8,
   },
   image: {
     type: String,
@@ -46,11 +45,11 @@ const user = new Schema({
   },
 });
 
-module.exports = mongoose.model('User', user);
-
 user.plugin(autoIncrement.plugin, {
   model: 'User',
   field: 'seq',
   startAt: 1, // 시작
   increment: 1, // 증가
 });
+
+module.exports = mongoose.model('User', user);

@@ -1,23 +1,28 @@
 const passport = require('passport');
 const { Strategy: LocalStrategy } = require('passport-local');
+const { createPassword } = require('./crypto');
 const User = require('../models/User');
 
-// {"userId": "chanyeong", "password": "password"}
+// {"email": "chanyeong", "password": "password"}
 // mongoose 조회 기능 살펴보기!!
-const passportConfig = { usernameField: 'userId', passwordField: 'password' };
+const passportConfig = { usernameField: 'email', passwordField: 'password' };
 
 // 사용자의 인증정보 확인하는 함수
-const passportVerify = async (userId, password, done) => {
+const passportVerify = async (email, password, done) => {
   try {
     // 유저 아이디로 일치하는 유저 데이터 검색
-    const user = await User.findOne({ user_id: userId });
+    const user = await User.findOne({ email });
     if (!user) {
       done(null, false, { reason: '존재하지 않는 사용자입니다.' });
       return;
     }
 
     // 검색된 유저 데이터가 있다면 유저 해쉬된 비밀번호 비교
-    const compareResult = await bcrypt.compare(password, user.password);
+    const { password: inputPassword } = await createPassword(
+      password,
+      user.salt,
+    );
+    const compareResult = inputPassword === user.password;
 
     // 해쉬된 비밀번호가 같다면 유저 데이터 객체 전송
     if (compareResult) {
