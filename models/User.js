@@ -22,6 +22,7 @@ const user = new Schema({
   gender: Number, // 0: 여성 1: 남성
   password: {
     type: String,
+    required: true,
     minlength: 8,
   },
   image: {
@@ -38,6 +39,10 @@ const user = new Schema({
     type: Number,
     required: true,
     default: 1,
+  },
+  salt: {
+    type: String,
+    required: true,
   },
 });
 
