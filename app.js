@@ -5,30 +5,42 @@ const passport = require('passport');
 const connect = require('./models');
 const indexRouter = require('./routes');
 const userRouter = require('./routes/users');
-const passportConfig = require('./passport/local');
+const passportConfig = require('./passport');
+const { jwtAuthenticater } = require('./routes/middlewares');
 
 const app = express();
 
+// passport strategy 설정 심기
 passportConfig();
+
+// mongodb 연결
 connect();
+
+// 로그 찍기
 app.use(morgan('dev'));
+
+// 정적 파일 경로 설정
 app.use(express.static(path.join(__dirname, 'public')));
+
+// body-parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// req 객체에 passport 설정 심기
 app.use(passport.initialize());
 
+// jwt 인증 미들웨어
+app.use(jwtAuthenticater);
+
+// 라우터 미들웨어
 app.use('/', indexRouter);
 app.use('/users', userRouter);
 
-app.use((req, res, next) => {
-  const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);
-  error.status = 404;
-  next(error);
-});
-
+// 에러 처리 미들웨어
 app.use((err, req, res, next) => {
   res.locals.message = err.message;
   res.locals.error = process.env.NODE_ENV !== 'production' ? err : {};
+  console.log(err);
   res.status(err.status || 500);
   res.send(err);
 });

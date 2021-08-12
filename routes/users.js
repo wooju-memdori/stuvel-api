@@ -95,6 +95,7 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
               expiresIn: '15m',
             },
           );
+          console.log(accessToken);
           // refreshToken 쿠키로 보내고 accessToken json payload로 보내기
           res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
