@@ -3,23 +3,19 @@ const path = require('path');
 const morgan = require('morgan');
 const passport = require('passport');
 const cookieParser = require('cookie-parser');
-const connect = require('./models');
+const { sequelize } = require('./models');
 const indexRouter = require('./routes');
 const userRouter = require('./routes/users');
 const passportConfig = require('./passport');
 const {
   accessTokenAuthenticater,
   refreshTokenAuthenticater,
-  isNotLoggedIn,
 } = require('./routes/middlewares');
 
 const app = express();
 
 // passport strategy 설정 심기
 passportConfig();
-
-// mongodb 연결
-connect();
 
 // 로그 찍기
 app.use(morgan('dev'));
@@ -30,6 +26,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 // body-parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+sequelize
+  .sync({ force: false })
+  .then(() => {
+    console.log('데이터베이스 연결 성공');
+  })
+  .catch(err => {
+    console.log(err);
+  });
 
 // cookie-parser
 app.use(cookieParser());

@@ -1,33 +1,27 @@
-const mongoose = require('mongoose');
-const autoIncrement = require('mongoose-auto-increment');
+const Sequelize = require('sequelize');
 
-const connect = () => {
-  if (process.env.NODE_ENV !== 'production') {
-    mongoose.set('debug', true);
-  }
+const env = process.env.NODE_ENV || 'development';
+const config = require('./config.json')[env];
+const User = require('./User');
+const Token = require('./Token');
 
-  mongoose.connect(
-    process.env.mongoURI,
-    {
-      dbName: 'nodejs',
-      useNewUrlParser: true,
-      useCreateIndex: true,
-      useUnifiedTopology: true,
-    },
-    error => {
-      if (error) {
-        console.log('몽고db 연결 에러', error);
-      } else {
-        console.log('몽고db 연결 성공', error);
-      }
-    },
-  );
-};
+const db = {};
 
-mongoose.connection.on('error', error => {
-  console.log('몽고db 연결 에러', error);
-});
+const sequelize = new Sequelize(
+  config.database,
+  config.username,
+  config.password,
+  config,
+);
+db.sequelize = sequelize;
 
-autoIncrement.initialize(mongoose.connection);
+db.User = User;
+db.Token = Token;
 
-module.exports = connect;
+User.init(sequelize);
+Token.init(sequelize);
+
+User.associate(db);
+Token.associate(db);
+
+module.exports = db;
