@@ -29,12 +29,22 @@ PeerServer({ port: port.peer, path: '/' });
 
 room.on('connection', socket => {
   socket.on('join-room', (roomId, userId) => {
-    console.log('roomId', roomId, 'userId', userId);
+    console.log('user', userId, 'joined room', roomId);
+
     socket.join(roomId);
+
     socket.to(roomId).emit('user-connected', userId); // send a message to the all in the room except me
 
     socket.on('disconnect', () => {
       socket.to(roomId).emit('user-disconnected', userId);
+    });
+
+    socket.on('display-media', value => {
+      socket.to(roomId).emit('display-media', { userID: userId, value });
+    });
+
+    socket.on('user-video-off', value => {
+      socket.to(roomId).emit('user-video-off', value);
     });
   });
 });
