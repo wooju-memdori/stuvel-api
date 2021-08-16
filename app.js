@@ -2,10 +2,12 @@ const express = require('express');
 const path = require('path');
 const morgan = require('morgan');
 const passport = require('passport');
+const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const { sequelize } = require('./models');
 const indexRouter = require('./routes');
 const userRouter = require('./routes/users');
+const roomRouter = require('./routes/room');
 const passportConfig = require('./passport');
 const {
   accessTokenAuthenticater,
@@ -19,6 +21,8 @@ passportConfig();
 
 // 로그 찍기
 app.use(morgan('dev'));
+
+app.use(cors());
 
 // 정적 파일 경로 설정
 app.use(express.static(path.join(__dirname, 'public')));
@@ -50,6 +54,10 @@ app.use(refreshTokenAuthenticater);
 // 라우터 미들웨어
 app.use('/', indexRouter);
 app.use('/users', userRouter);
+app.use('/room', roomRouter);
+
+// 뷰 엔진
+app.set('view engine', 'ejs');
 
 // 에러 처리 미들웨어
 app.use((err, req, res, next) => {
