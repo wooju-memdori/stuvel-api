@@ -1,9 +1,9 @@
 const express = require('express');
+const { isLoggedIn } = require('./middlewares');
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
-  res.render('home');
+router.get('/', isLoggedIn, async (req, res, next) => {
 });
 
 module.exports = router;

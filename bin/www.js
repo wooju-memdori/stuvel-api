@@ -1,9 +1,26 @@
 const { PeerServer } = require('peer');
-const http = require('http');
 const socketIO = require('socket.io');
+const http = require('http');
+const path = require('path');
+const dotenv = require('dotenv');
+
+dotenv.config({
+  path: path.resolve(
+    process.cwd(),
+    process.env.NODE_ENV === 'production' ? '.env' : '.env.dev',
+  ),
+});
+
 const app = require('../app');
 
-const server = http.Server(app);
+const port = 3000;
+app.set('port', port);
+
+const server = http.createServer(app);
+// const server = http.Server(app);
+
+
+// const io = socketIO(server);
 const io = socketIO(server, {
   cors: {
     origin: '*',
@@ -14,7 +31,6 @@ const options = {
   host: '0.0.0.0',
   port: 3000,
 };
-// const io = socketIO(server);
 
 const room = io.of('room');
 
@@ -39,6 +55,8 @@ room.on('connection', socket => {
   });
 });
 
+
 server.listen(options, () => {
   console.log(port.stuvel, '번 포트에서 대기중');
+  
 });

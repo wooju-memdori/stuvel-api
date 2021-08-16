@@ -1,37 +1,71 @@
 const express = require('express');
 const path = require('path');
 const morgan = require('morgan');
+const passport = require('passport');
 const cors = require('cors');
-const connect = require('./models');
+const cookieParser = require('cookie-parser');
+const { sequelize } = require('./models');
 const indexRouter = require('./routes');
+const userRouter = require('./routes/users');
 const roomRouter = require('./routes/room');
+const passportConfig = require('./passport');
+const {
+  accessTokenAuthenticater,
+  refreshTokenAuthenticater,
+} = require('./routes/middlewares');
 
 const app = express();
-app.use(cors());
-connect();
+
+// passport strategy 설정 심기
+passportConfig();
+
+// 로그 찍기
 app.use(morgan('dev'));
+
+app.use(cors());
+
+// 정적 파일 경로 설정
 app.use(express.static(path.join(__dirname, 'public')));
+
+// body-parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.set('view engine', 'ejs');
+sequelize
+  .sync({ force: false })
+  .then(() => {
+    console.log('데이터베이스 연결 성공');
+  })
+  .catch(err => {
+    console.log(err);
+  });
 
-// 라우터
+// cookie-parser
+app.use(cookieParser());
+
+// req 객체에 passport 설정 심기
+app.use(passport.initialize());
+
+// accessToken 인증 미들웨어
+app.use(accessTokenAuthenticater);
+// refreshToken 인증 미들웨어
+app.use(refreshTokenAuthenticater);
+
+// 라우터 미들웨어
 app.use('/', indexRouter);
+app.use('/users', userRouter);
 app.use('/room', roomRouter);
 
-app.use((req, res, next) => {
-  const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);
-  error.status = 404;
-  next(error);
-});
+// 뷰 엔진
+app.set('view engine', 'ejs');
 
+// 에러 처리 미들웨어
 app.use((err, req, res, next) => {
-  // res.locals.message = err.message;
-  // res.locals.error = process.env.NODE_ENV !== 'production' ? err : {};
-  // res.status(err.status || 500);
-  // res.render('error');
+  res.locals.message = err.message;
+  res.locals.error = process.env.NODE_ENV !== 'production' ? err : {};
   console.log(err);
+  res.status(err.status || 500);
+  res.send(err);
 });
 
 module.exports = app;
