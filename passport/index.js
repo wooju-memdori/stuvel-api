@@ -1,6 +1,7 @@
 const passport = require('passport');
 const { Strategy: LocalStrategy } = require('passport-local');
 const { ExtractJwt, Strategy: JWTStrategy } = require('passport-jwt');
+const jwt = require('jsonwebtoken');
 const { Strategy: CustomStrategy } = require('passport-custom');
 const { createPassword } = require('./crypto');
 const User = require('../models/User');
@@ -15,7 +16,7 @@ const passportVerify = async (email, password, done) => {
   try {
     console.log('passportVerify');
     // 유저 아이디로 일치하는 유저 데이터 검색
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ where: { email } });
     if (!user) {
       done(null, false, { reason: '존재하지 않는 사용자입니다.' });
       return;
@@ -53,7 +54,7 @@ const accessTokenConfig = {
 const accessTokenVerify = async (jwtPayload /* 토큰의 데이터 부분 */, done) => {
   try {
     // payload의 id값으로 유저의 데이터 조회
-    const user = await User.findOne({ seq: jwtPayload.userSeq });
+    const user = await User.findOne({ where: { id: jwtPayload.userId } });
     // 유저 데이터가 있다면 유저 데이터 객체 전송
     if (user) {
       done(null, user);
@@ -71,18 +72,21 @@ const accessTokenVerify = async (jwtPayload /* 토큰의 데이터 부분 */, do
 const refreshTokenVerify = async (req, done) => {
   if (!req.cookies.refreshToken) {
     console.log('refreshToken 없음');
-    done(null, false, { reason: '올바르지 않은 refreshToken 입니다.' });
+    done(null, false, { reason: 'refreshToken 없음' });
     return;
   }
   const refreshToken = await Token.findOne({
-    content: req.cookies.refreshToken,
+    where: {
+      content: req.cookies.refreshToken,
+    },
   });
-  if (!refreshToken) {
+  const decoded = jwt.verify(req.cookies.refreshToken, process.env.JWT_SECRET);
+  if (!refreshToken || !decoded) {
     console.log('올바르지 않은 refreshToken');
     done(null, false, { reason: '올바르지 않은 refreshToken 입니다.' });
     return;
   }
-  const user = await User.findOne({ seq: refreshToken.userSeq });
+  const user = await User.findOne({ where: { id: refreshToken.userId } });
   done(null, user);
 };
 

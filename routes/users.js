@@ -25,7 +25,7 @@ router.post('/signup', upload.single('image'), async (req, res) => {
   try {
     const newSalt = await createSalt();
     const { password } = await createPassword(req.body.password, newSalt);
-    const userInfo = new User({
+    const user = User.create({
       email: req.body.email,
       nickname: req.body.nickname,
       gender: req.body.gender,
@@ -33,16 +33,15 @@ router.post('/signup', upload.single('image'), async (req, res) => {
       image: req.file.location,
       tag: req.body.tag,
       salt: newSalt,
-    });
-
-    userInfo.save((err, doc) => {
-      if (err) {
-        console.error(err);
-        res.json({ message: '생성 실패' });
-        return;
-      }
-      res.json({ message: '생성 완료!' });
-    });
+    })
+      .then(result => {
+        console.log('데이터 추가 완료');
+        res.json({ result });
+      })
+      .catch(err => {
+        console.log('데이터 추가 실패');
+        res.json({ err });
+      });
   } catch (err) {
     res.status(500).send(err);
     console.log(err);
@@ -78,24 +77,31 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
           );
 
           // DB에 refreshToken가 있으면 업데이트
-          if (Token.findOne({ userSeq: user.seq })) {
-            Token.updateOne({ userSeq: user.seq }, { content: refreshToken });
+          if (Token.findOne({ userId: user.id })) {
+            Token.update(
+              { content: refreshToken },
+              { where: { userId: user.id } },
+            );
             // DB에 refreshToken가 없으면 저장
           } else {
-            const token = new Token({
-              content: refreshToken,
-              userSeq: user.seq,
-            });
-
             try {
-              token.save();
+              Token.create({
+                content: refreshToken,
+                userId: user.id,
+              })
+                .then(result => {
+                  console.log('데이터 추가 완료');
+                })
+                .catch(err => {
+                  console.log('데이터 추가 실패');
+                });
             } catch (error) {
               res.status(500).json({ error });
             }
           }
           // accessToken 발급
           const accessToken = jwt.sign(
-            { userSeq: user.seq },
+            { userId: user.id },
             process.env.JWT_SECRET,
             {
               expiresIn: '15m',
@@ -116,27 +122,30 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
   }
 });
 
-// // 회원 조회 (READ)
-// router.get('/user/:nickname', (req, res) => {
-//   User.findOne({ nickname: req.params.nickname }, (err, user) => {
-//     if (err) return res.status(500).json({ error: err });
-//     if (!user)
-//       return res
-//         .status(404)
-//         .json({ error: '해당 닉네임을 가진 유저가 존재하지 않습니다.' });
-//     return res.json(user);
-//   });
-// });
+// 회원 조회 (READ)
+router.get('/:id', async (req, res) => {
+  const user = await User.findOne({ where: { id: req.params.id } })
+    .then(user => {
+      if (!user) {
+        res.send({ message: '해당 사용자가 없습니다.' });
+      } else {
+        res.send({ user });
+      }
+    })
+    .catch(error => {
+      res.send({ error });
+    });
+});
 
-// // 회원 삭제 (DELETE)
-// router.delete('/delete', (req, res) => {
-//   User.remove({ email: req.body.email }, (err, output) => {
-//     if (err) return res.status(500).json({ error: 'Database Failure!' });
-
-//     res.json({ message: '삭제 완료' });
-
-//     res.status(204).end();
-//   });
-// });
+// 회원 삭제 (DELETE)
+router.delete('/:id', (req, res) => {
+  User.destroy({ where: { id: req.body.id } })
+    .then(() => {
+      res.send({ message: '해당 사용자를 삭제했습니다.' });
+    })
+    .catch(error => {
+      res.send({ error });
+    });
+});
 
 module.exports = router;

@@ -19,11 +19,11 @@ class User extends Sequelize.Model {
           allowNull: true,
         },
         password: {
-          type: Sequelize.STRING(20),
+          type: Sequelize.STRING(100),
           allowNull: false,
         },
         image: {
-          type: Sequelize.STRING(100),
+          type: Sequelize.STRING(200),
           allowNull: true,
           unique: true,
         },
@@ -60,7 +60,7 @@ class User extends Sequelize.Model {
 
   // 다른 모델과의 관계를 서술하는 associate 메서드
   static associate(db) {
-    db.User.hasOne(db.Token, { foreignKey: 'UseuserId', sourceKey: 'id' });
+    db.User.hasOne(db.Token, { foreignKey: 'userId', sourceKey: 'id' });
   }
 }
 
