@@ -13,12 +13,8 @@ dotenv.config({
 
 const app = require('../app');
 
-const port = 3000;
-app.set('port', port);
-
 const server = http.createServer(app);
 // const server = http.Server(app);
-
 
 // const io = socketIO(server);
 const io = socketIO(server, {
@@ -27,21 +23,16 @@ const io = socketIO(server, {
   },
 });
 
-const options = {
-  host: '0.0.0.0',
-  port: 3000,
-};
-
 const room = io.of('room');
 
-const port = {
+const ports = {
   stuvel: 3000,
   peer: 3001,
 };
 
-app.set('port', port.stuvel);
+app.set('port', ports.stuvel);
 
-PeerServer({ port: port.peer, path: '/' });
+PeerServer({ port: ports.peer, path: '/' });
 
 room.on('connection', socket => {
   socket.on('join-room', (roomId, userId) => {
@@ -55,8 +46,11 @@ room.on('connection', socket => {
   });
 });
 
+const options = {
+  host: '0.0.0.0',
+  port: ports.stuvel,
+};
 
 server.listen(options, () => {
-  console.log(port.stuvel, '번 포트에서 대기중');
-  
+  console.log(options.port, '번 포트에서 대기중');
 });

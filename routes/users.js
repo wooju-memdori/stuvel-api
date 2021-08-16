@@ -76,15 +76,14 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
             },
           );
 
-          // DB에 refreshToken가 있으면 업데이트
-          if (Token.findOne({ userId: user.id })) {
-            Token.update(
-              { content: refreshToken },
-              { where: { userId: user.id } },
-            );
-            // DB에 refreshToken가 없으면 저장
-          } else {
-            try {
+          // DB에 refreshToken가 있으면 업데이트, 없으면 저장
+          Token.findOne({ where: { userId: user.id } }).then(result => {
+            if (result) {
+              Token.update(
+                { content: refreshToken, userId: user.id },
+                { where: { userId: user.id } },
+              );
+            } else {
               Token.create({
                 content: refreshToken,
                 userId: user.id,
@@ -93,12 +92,12 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
                   console.log('데이터 추가 완료');
                 })
                 .catch(err => {
+                  console.log(err);
                   console.log('데이터 추가 실패');
                 });
-            } catch (error) {
-              res.status(500).json({ error });
             }
-          }
+          });
+
           // accessToken 발급
           const accessToken = jwt.sign(
             { userId: user.id },
@@ -139,7 +138,8 @@ router.get('/:id', async (req, res) => {
 
 // 회원 삭제 (DELETE)
 router.delete('/:id', (req, res) => {
-  User.destroy({ where: { id: req.body.id } })
+  Token.destroy({ where: { userId: req.params.id } });
+  User.destroy({ where: { id: req.params.id } })
     .then(() => {
       res.send({ message: '해당 사용자를 삭제했습니다.' });
     })

@@ -80,7 +80,16 @@ const refreshTokenVerify = async (req, done) => {
       content: req.cookies.refreshToken,
     },
   });
-  const decoded = jwt.verify(req.cookies.refreshToken, process.env.JWT_SECRET);
+  try {
+    const decoded = jwt.verify(
+      req.cookies.refreshToken,
+      process.env.JWT_SECRET,
+    );
+  } catch (err) {
+    console.log('유효하지 않은 refreshToken');
+    done(null, false, { reason: '올바르지 않은 refreshToken 입니다.' });
+    return;
+  }
   if (!refreshToken || !decoded) {
     console.log('올바르지 않은 refreshToken');
     done(null, false, { reason: '올바르지 않은 refreshToken 입니다.' });

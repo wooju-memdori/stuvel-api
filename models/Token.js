@@ -6,7 +6,7 @@ class Token extends Sequelize.Model {
     return super.init(
       {
         content: {
-          type: Sequelize.STRING(20),
+          type: Sequelize.STRING(150),
           unique: true,
           allowNull: false,
         },
