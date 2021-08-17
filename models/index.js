@@ -4,6 +4,9 @@ const Token = require('./Token');
 
 const db = {};
 
+console.log(process.env.USER_NAME);
+console.log(process.env.PASSWORD);
+console.log(process.env.DATABASE);
 const config = {
   username: process.env.USER_NAME,
   password: process.env.PASSWORD,
