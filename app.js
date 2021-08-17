@@ -12,6 +12,7 @@ const passportConfig = require('./passport');
 const {
   accessTokenAuthenticater,
   refreshTokenAuthenticater,
+  isLoggedIn,
 } = require('./routes/middlewares');
 
 const app = express();
@@ -54,7 +55,7 @@ app.use(refreshTokenAuthenticater);
 // 라우터 미들웨어
 app.use('/', indexRouter);
 app.use('/users', userRouter);
-app.use('/room', roomRouter);
+app.use('/room', isLoggedIn, roomRouter);
 
 // 뷰 엔진
 app.set('view engine', 'ejs');

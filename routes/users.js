@@ -4,49 +4,54 @@ const passport = require('passport');
 const { createSalt, createPassword } = require('../passport/crypto');
 const Token = require('../models/Token');
 const User = require('../models/User');
-const { isNotLoggedIn } = require('./middlewares');
+const { isNotLoggedIn, isLoggedIn } = require('./middlewares');
 const upload = require('../bin/multer');
 
 const router = express.Router();
 
 // 회원가입
-router.post('/signup', upload.single('image'), async (req, res) => {
-  try {
-    if (!req.body.email || !req.body.nickname || !req.body.password) {
-      res.send({
-        status: false,
-        message: '파일 업로드 실패',
-      });
+router.post(
+  '/signup',
+  isNotLoggedIn,
+  upload.single('image'),
+  async (req, res) => {
+    try {
+      if (!req.body.email || !req.body.nickname || !req.body.password) {
+        res.send({
+          status: false,
+          message: '파일 업로드 실패',
+        });
+      }
+    } catch (err) {
+      res.status(500).send(err);
     }
-  } catch (err) {
-    res.status(500).send(err);
-  }
 
-  try {
-    const newSalt = await createSalt();
-    const { password } = await createPassword(req.body.password, newSalt);
-    const user = User.create({
-      email: req.body.email,
-      nickname: req.body.nickname,
-      gender: req.body.gender,
-      password,
-      image: req.file.location,
-      tag: req.body.tag,
-      salt: newSalt,
-    })
-      .then(result => {
-        console.log('데이터 추가 완료');
-        res.json({ result });
+    try {
+      const newSalt = await createSalt();
+      const { password } = await createPassword(req.body.password, newSalt);
+      const user = User.create({
+        email: req.body.email,
+        nickname: req.body.nickname,
+        gender: req.body.gender,
+        password,
+        image: req.file.location,
+        tag: req.body.tag,
+        salt: newSalt,
       })
-      .catch(err => {
-        console.log('데이터 추가 실패');
-        res.json({ err });
-      });
-  } catch (err) {
-    res.status(500).send(err);
-    console.log(err);
-  }
-});
+        .then(result => {
+          console.log('데이터 추가 완료');
+          res.json({ result });
+        })
+        .catch(err => {
+          console.log('데이터 추가 실패');
+          res.json({ err });
+        });
+    } catch (err) {
+      res.status(500).send(err);
+      console.log(err);
+    }
+  },
+);
 
 // 로그인 (로그아웃상태에서만 접근 가능)
 router.post('/login', isNotLoggedIn, (req, res, next) => {
@@ -122,7 +127,7 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
 });
 
 // 회원 조회 (READ)
-router.get('/:id', async (req, res) => {
+router.get('/:id', isLoggedIn, async (req, res) => {
   const user = await User.findOne({ where: { id: req.params.id } })
     .then(user => {
       if (!user) {
@@ -137,7 +142,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // 회원 삭제 (DELETE)
-router.delete('/:id', (req, res) => {
+router.delete('/:id', isLoggedIn, (req, res) => {
   Token.destroy({ where: { userId: req.params.id } });
   User.destroy({ where: { id: req.params.id } })
     .then(() => {

@@ -14,7 +14,6 @@ const passportConfig = { usernameField: 'email', passwordField: 'password' };
 // 사용자의 인증정보 확인하는 함수
 const passportVerify = async (email, password, done) => {
   try {
-    console.log('passportVerify');
     // 유저 아이디로 일치하는 유저 데이터 검색
     const user = await User.findOne({ where: { email } });
     if (!user) {
@@ -31,7 +30,6 @@ const passportVerify = async (email, password, done) => {
 
     // 해쉬된 비밀번호가 같다면 유저 데이터 객체 전송
     if (compareResult) {
-      console.log('로그인 인증은 됩니다.');
       done(null, user);
       return;
     }
@@ -71,7 +69,6 @@ const accessTokenVerify = async (jwtPayload /* 토큰의 데이터 부분 */, do
 // refreshToken 인증 strategy
 const refreshTokenVerify = async (req, done) => {
   if (!req.cookies.refreshToken) {
-    console.log('refreshToken 없음');
     done(null, false, { reason: 'refreshToken 없음' });
     return;
   }
@@ -86,12 +83,10 @@ const refreshTokenVerify = async (req, done) => {
       process.env.JWT_SECRET,
     );
   } catch (err) {
-    console.log('유효하지 않은 refreshToken');
     done(null, false, { reason: '올바르지 않은 refreshToken 입니다.' });
     return;
   }
   if (!refreshToken || !decoded) {
-    console.log('올바르지 않은 refreshToken');
     done(null, false, { reason: '올바르지 않은 refreshToken 입니다.' });
     return;
   }
