@@ -1,10 +1,16 @@
 const Sequelize = require('sequelize');
-const env = process.env.NODE_ENV || 'development';
-const config = require('./config.json')[env];
 const User = require('./User');
 const Token = require('./Token');
 
 const db = {};
+
+const config = {
+  username: process.env.USER_NAME,
+  password: process.env.PASSWORD,
+  database: process.env.DATABASE,
+  host: process.env.HOST,
+  dialect: process.env.DIALECT,
+};
 
 const sequelize = new Sequelize(
   config.database,
