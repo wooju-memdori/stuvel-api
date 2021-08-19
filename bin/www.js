@@ -3,6 +3,9 @@ const socketIO = require('socket.io');
 const http = require('http');
 const path = require('path');
 const dotenv = require('dotenv');
+const { Op, Sequelize } = require('sequelize');
+const Room = require('../models/Room');
+const User = require('../models/User');
 
 dotenv.config({
   path: path.resolve(
@@ -35,12 +38,38 @@ app.set('port', ports.stuvel);
 PeerServer({ port: ports.peer, path: '/' });
 
 room.on('connection', socket => {
-  socket.on('join-room', (roomId, userId) => {
+  socket.on('join-room', async (roomId, userId) => {
     console.log('roomId', roomId, 'userId', userId);
     socket.join(roomId);
-    socket.to(roomId).emit('user-connected', userId); // send a message to the all in the room except me
 
-    socket.on('disconnect', () => {
+    const { joined_count: joinedCountConnected } = await Room.findOne({
+      where: { id: roomId },
+    });
+    console.log('joinedCount = ', joinedCountConnected);
+    Room.update(
+      {
+        joined_count: joinedCountConnected + 1,
+      },
+      { where: { id: roomId } },
+    )
+      .then(result => {
+        console.log(result);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+    socket.to(roomId).emit('user-connected', userId); // send a message to the all in the room except me
+    socket.on('disconnect', async () => {
+      User.update({ roomId }, { where: { id: userId } });
+      const { joined_count: joinedCountDisconnected } = await Room.findOne({
+        where: { id: roomId },
+      });
+      Room.update(
+        {
+          joined_count: joinedCountDisconnected - 1,
+        },
+        { where: { id: roomId } },
+      );
       socket.to(roomId).emit('user-disconnected', userId);
     });
   });
