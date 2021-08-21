@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 const User = require('./User');
 const Token = require('./Token');
+const Room = require('./Room');
 
 const db = {};
 
@@ -22,11 +23,14 @@ db.sequelize = sequelize;
 
 db.User = User;
 db.Token = Token;
+db.Room = Room;
 
 User.init(sequelize);
 Token.init(sequelize);
+Room.init(sequelize);
 
 User.associate(db);
 Token.associate(db);
+Room.associate(db);
 
 module.exports = db;
