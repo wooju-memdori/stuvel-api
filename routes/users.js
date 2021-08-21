@@ -62,8 +62,7 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
       { session: false },
       async (err, user, info) => {
         if (err || !user) {
-          res.status(400).json({ message: info.reason });
-          console.log(err);
+          res.json({ message: info.reason });
           return;
         }
         // user 데이터를 통해 로그인 진행
@@ -108,7 +107,7 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
             { userId: user.id },
             process.env.JWT_SECRET,
             {
-              expiresIn: '15m',
+              expiresIn: '2d',
             },
           );
           // refreshToken 쿠키로 보내고 accessToken json payload로 보내기
@@ -124,6 +123,26 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
     console.log(err);
     next(err);
   }
+});
+
+// accessToken 연장
+router.post('/silent-refresh', isLoggedIn, (req, res, next) => {
+  // 'local' 전략 수행 후 성공/실패 시 호출되는 커스텀 콜백 구현
+  passport.authenticate('refreshToken', { sessions: false }, (error, user) => {
+    if (user) {
+      const accessToken = jwt.sign(
+        { userSeq: user.seq },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: '2d',
+        },
+      );
+      res.json({ accessToken });
+    } else {
+      console.log('refreshToken 인증 실패');
+      res.status(401).send({ message: 'refreshToken 유효하지 않음' });
+    }
+  })(req, res, next);
 });
 
 // 회원 조회 (READ)

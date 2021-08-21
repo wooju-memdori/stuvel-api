@@ -82,11 +82,11 @@ const refreshTokenVerify = async (req, done) => {
       req.cookies.refreshToken,
       process.env.JWT_SECRET,
     );
+    if (!refreshToken || !decoded) {
+      done(null, false, { reason: '올바르지 않은 refreshToken 입니다.' });
+      return;
+    }
   } catch (err) {
-    done(null, false, { reason: '올바르지 않은 refreshToken 입니다.' });
-    return;
-  }
-  if (!refreshToken || !decoded) {
     done(null, false, { reason: '올바르지 않은 refreshToken 입니다.' });
     return;
   }

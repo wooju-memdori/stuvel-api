@@ -46,7 +46,7 @@ exports.refreshTokenAuthenticater = (req, res, next) => {
           expiresIn: '15m',
         },
       );
-      res.json({ accessToken });
+      res.status(403).send({ accessToken });
     } else {
       console.log('refreshToken 인증 실패');
       next();
