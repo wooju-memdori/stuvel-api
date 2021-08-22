@@ -1,12 +1,12 @@
-module.exports.success = async data => {
+module.exports.success = data => {
   return {
     data,
   };
 };
 
-module.exports.error = async (message, code) => {
+module.exports.failed = (message, code) => {
   return {
-    code: code ? 500 : code,
+    code: code || 500,
     message,
   };
 };
