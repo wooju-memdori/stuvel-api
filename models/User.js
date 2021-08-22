@@ -46,6 +46,11 @@ class User extends Sequelize.Model {
           type: Sequelize.STRING(150),
           allowNull: false,
         },
+        roomId: {
+          field: 'room_id',
+          type: Sequelize.INTEGER,
+          allowNull: true,
+        },
       },
       {
         sequelize,
@@ -62,8 +67,8 @@ class User extends Sequelize.Model {
 
   // 다른 모델과의 관계를 서술하는 associate 메서드
   static associate(db) {
-    db.User.hasOne(db.Token, { foreignKey: 'userId', sourceKey: 'id' });
-    db.User.belongsTo(db.Room, { foreignKey: 'roomId' });
+    db.User.hasOne(db.Token, { foreignKey: 'user_id', sourceKey: 'id' });
+    db.User.belongsTo(db.Room, { foreignKey: 'room_id' });
   }
 }
 
