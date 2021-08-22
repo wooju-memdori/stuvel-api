@@ -38,10 +38,10 @@ app.set('port', ports.stuvel);
 PeerServer({ port: ports.peer, path: '/' });
 
 room.on('connection', socket => {
-  socket.on('join-room', async (roomId, userId) => {
-    console.log('roomId', roomId, 'userId', userId);
+  socket.on('join-room', async (roomId, userPeerId, userId) => {
+    console.log('roomId', roomId, 'userPeerId', userPeerId, 'userId', userId);
     socket.join(roomId);
-
+    User.update({ roomId }, { where: { id: userId } });
     const { joined_count: joinedCountConnected } = await Room.findOne({
       where: { id: roomId },
     });
@@ -58,9 +58,9 @@ room.on('connection', socket => {
       .catch(err => {
         console.log(err);
       });
-    socket.to(roomId).emit('user-connected', userId); // send a message to the all in the room except me
+    socket.to(roomId).emit('user-connected', userPeerId); // send a message to the all in the room except me
     socket.on('disconnect', async () => {
-      User.update({ roomId }, { where: { id: userId } });
+      User.update({ roomId: null }, { where: { id: userId } });
       const { joined_count: joinedCountDisconnected } = await Room.findOne({
         where: { id: roomId },
       });
@@ -70,7 +70,7 @@ room.on('connection', socket => {
         },
         { where: { id: roomId } },
       );
-      socket.to(roomId).emit('user-disconnected', userId);
+      socket.to(roomId).emit('user-disconnected', userPeerId);
     });
   });
 });

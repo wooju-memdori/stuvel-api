@@ -2,6 +2,7 @@ const express = require('express');
 const { v4: uuidV4 } = require('uuid');
 const { Op } = require('sequelize');
 const Room = require('../models/Room');
+const User = require('../models/User');
 
 const router = express.Router();
 
@@ -43,9 +44,29 @@ router.get('/', async (req, res) => {
     });
 });
 
-// 특정 방 들어가기
-router.get('/:room', (req, res) => {
-  res.render('room', { roomId: req.params.room });
+// // 방에 있는 사용자들의 정보 보내주기
+// router.get('/:room/users', (req, res) => {
+//   // 해당 방에 들어가있는 사용자들 검색
+//   const users = User.findAll(
+//     {
+//       attributes: ['nickname', 'gender', 'image', 'tag', 'level', 'mobumScore'],
+//     },
+//     { where: { roomId: req.params.room } },
+//   );
+
+//   console.log(users);
+// });
+
+// 클라이언트가 특정 방에 들어갔음을 확인
+router.post('/:room', (req, res) => {
+  // 해당 방에 들어가있는 사용자들 검색
+  User.update({ roomId: req.params.room }, { where: { id: req.user.id } })
+    .then(() => {
+      res.send({ userId: req.user.id });
+    })
+    .catch(err => {
+      res.status(500).send({ err });
+    });
 });
 
 module.exports = router;

@@ -115,7 +115,7 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
             httpOnly: true,
             maxAge: 1000 * 60 * 60 * 24 * 14,
           });
-          res.json({ accessToken });
+          res.json({ accessToken, userId: user.id });
         });
       },
     )(req, res, next);
