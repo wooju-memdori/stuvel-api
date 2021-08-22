@@ -31,18 +31,18 @@ db.Tag = Tag;
 db.Follow = Follow;
 db.UserTag = UserTag;
 
+Follow.init(sequelize);
 User.init(sequelize);
 Token.init(sequelize);
 Room.init(sequelize);
 Tag.init(sequelize);
-Follow.init(sequelize);
 UserTag.init(sequelize);
 
+Follow.associate(db);
 User.associate(db);
 Token.associate(db);
 Room.associate(db);
 Tag.associate(db);
-Follow.associate(db);
 UserTag.associate(db);
 
 module.exports = db;

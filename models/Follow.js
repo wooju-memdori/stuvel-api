@@ -41,7 +41,7 @@ class Follow extends Sequelize.Model {
       foreignKey: 'subject_id',
     });
     db.Follow.belongsTo(db.User, {
-      as: 'following',
+      as: 'followings',
       foreignKey: 'target_id',
     });
   }

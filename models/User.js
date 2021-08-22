@@ -46,6 +46,10 @@ class User extends Sequelize.Model {
           type: Sequelize.STRING(150),
           allowNull: false,
         },
+        roomId: {
+          type: Sequelize.STRING(150),
+          allowNull: true,
+        },
       },
       {
         sequelize,
@@ -70,12 +74,12 @@ class User extends Sequelize.Model {
     });
     db.User.belongsToMany(db.User, {
       through: 'Follow',
-      as: 'Follower',
+      as: 'followers',
       foreignKey: 'subject_id',
     });
     db.User.belongsToMany(db.User, {
       through: 'Follow',
-      as: 'Followee',
+      as: 'followings',
       foreignKey: 'target_id',
     });
   }
