@@ -1,6 +1,7 @@
 const express = require('express');
 const Follow = require('../models/Follow');
 const User = require('../models/User');
+const { success, failed } = require('../common/response');
 
 const router = express.Router();
 
@@ -10,16 +11,17 @@ router.get('/followers', async (req, res) => {
       {
         model: User,
         as: 'followers',
-        attributes: ['id', 'email'],
+        attributes: ['id', 'email', 'nickname', 'image', 'roomId'],
       },
     ],
-    where: { targetId: req.user.id },
+    where: { targetId: req.user.dataValues.id },
   })
     .then(result => {
-      res.send(result);
+      const response = result.map(item => item.followers);
+      res.send(success(response));
     })
     .catch(err => {
-      console.log(err);
+      console.log(failed(err));
       res.send(err);
     });
 });
@@ -29,18 +31,18 @@ router.get('/followings', async (req, res) => {
     include: [
       {
         model: User,
-        as: 'following',
-        attributes: ['id', 'email'],
+        as: 'followings',
+        attributes: ['id', 'email', 'nickname', 'image', 'roomId'],
       },
     ],
-    where: { targetId: req.user.id },
+    where: { subjectId: req.user.dataValues.id },
   })
     .then(result => {
-      res.send(result);
+      const response = result.map(item => item.followings);
+      res.send(success(response));
     })
     .catch(err => {
-      console.log(err);
-      res.send(err);
+      res.send(failed(err));
     });
 });
 
@@ -50,24 +52,28 @@ router.post('/follow/:id', async (req, res) => {
     targetId: req.params.id,
   })
     .then(result => {
-      res.send(result);
+      res.send(success(result));
     })
     .catch(err => {
       console.log(err);
-      res.send(err);
+      res.send(failed(err));
     });
 });
 
 router.delete('/follow/:id', async (req, res) => {
-  Follow.delete({
+  Follow.destroy({
     where: {
       subjectId: req.user.dataValues.id,
       targetId: req.params.id,
     },
-  }).catch(err => {
-    console.log(err);
-    res.send(err);
-  });
+  })
+    .then(result => {
+      res.send(success(req.params.id));
+    })
+    .catch(err => {
+      console.log(err);
+      res.send(failed(err));
+    });
 });
 
 module.exports = router;
