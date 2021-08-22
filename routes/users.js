@@ -34,7 +34,7 @@ router.post(
         nickname: req.body.nickname,
         gender: req.body.gender,
         password,
-        image: req.file.location,
+        image: req.file?.location,
         tag: req.body.tag,
         salt: newSalt,
       })

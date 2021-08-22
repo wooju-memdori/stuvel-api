@@ -8,6 +8,7 @@ const { sequelize } = require('./models');
 const indexRouter = require('./routes');
 const userRouter = require('./routes/users');
 const roomRouter = require('./routes/room');
+const followRouter = require('./routes/follow');
 const passportConfig = require('./passport');
 const {
   accessTokenAuthenticater,
@@ -62,6 +63,7 @@ app.use(accessTokenAuthenticater);
 app.use('/', indexRouter);
 app.use('/users', userRouter);
 app.use('/room', isLoggedIn, roomRouter);
+app.use('/follow', isLoggedIn, followRouter);
 
 // 뷰 엔진
 app.set('view engine', 'ejs');
