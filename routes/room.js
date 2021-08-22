@@ -44,18 +44,20 @@ router.get('/', async (req, res) => {
     });
 });
 
-// // 방에 있는 사용자들의 정보 보내주기
-// router.get('/:room/users', (req, res) => {
-//   // 해당 방에 들어가있는 사용자들 검색
-//   const users = User.findAll(
-//     {
-//       attributes: ['nickname', 'gender', 'image', 'tag', 'level', 'mobumScore'],
-//     },
-//     { where: { roomId: req.params.room } },
-//   );
-
-//   console.log(users);
-// });
+// 방에 있는 사용자들의 정보 보내주기
+router.get('/:room/users', async (req, res) => {
+  // 해당 방에 들어가있는 사용자들 검색
+  await User.findAll({
+    attributes: ['nickname', 'gender', 'image', 'tag', 'level', 'mobum_score'],
+    where: { roomId: req.params.room },
+  })
+    .then(users => {
+      res.send({ users });
+    })
+    .catch(err => {
+      res.status(500).send({ err });
+    });
+});
 
 // 클라이언트가 특정 방에 들어갔음을 확인
 router.post('/:room', (req, res) => {
