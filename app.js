@@ -63,7 +63,7 @@ app.use(accessTokenAuthenticater);
 app.use('/', indexRouter);
 app.use('/users', userRouter);
 app.use('/room', isLoggedIn, roomRouter);
-app.use('/follow', isLoggedIn, followRouter);
+app.use('/', isLoggedIn, followRouter);
 
 // 뷰 엔진
 app.set('view engine', 'ejs');

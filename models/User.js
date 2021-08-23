@@ -48,7 +48,7 @@ class User extends Sequelize.Model {
         },
         roomId: {
           field: 'room_id',
-          type: Sequelize.INTEGER,
+          type: Sequelize.STRING(150),
           allowNull: true,
         },
       },
@@ -69,6 +69,20 @@ class User extends Sequelize.Model {
   static associate(db) {
     db.User.hasOne(db.Token, { foreignKey: 'user_id', sourceKey: 'id' });
     db.User.belongsTo(db.Room, { foreignKey: 'room_id' });
+    db.User.belongsToMany(db.Tag, {
+      through: 'UserTag',
+      foreignKey: 'user_id',
+    });
+    db.User.belongsToMany(db.User, {
+      through: 'Follow',
+      as: 'followers',
+      foreignKey: 'subject_id',
+    });
+    db.User.belongsToMany(db.User, {
+      through: 'Follow',
+      as: 'followings',
+      foreignKey: 'target_id',
+    });
   }
 }
 

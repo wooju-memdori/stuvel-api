@@ -4,7 +4,23 @@ class Follow extends Sequelize.Model {
   static init(sequelize) {
     // 모델 동기화를 위한 부모 model의 init 메서드 호출
     return super.init(
-      {},
+      {
+        id: {
+          type: Sequelize.INTEGER,
+          primaryKey: true,
+          autoIncrement: true,
+        },
+        subjectId: {
+          field: 'subject_id',
+          type: Sequelize.INTEGER,
+          allowNull: false,
+        },
+        targetId: {
+          field: 'target_id',
+          type: Sequelize.INTEGER,
+          allowNull: false,
+        },
+      },
       {
         sequelize,
         timestamps: true, // 속성값이 true일 경우, createdAt과 updatedAt 컬럼이 자동 추가되며 생성/수정 시간 기록
@@ -21,11 +37,11 @@ class Follow extends Sequelize.Model {
   // 다른 모델과의 관계를 서술하는 associate 메서드
   static associate(db) {
     db.Follow.belongsTo(db.User, {
-      as: 'Follower',
+      as: 'followers',
       foreignKey: 'subject_id',
     });
     db.Follow.belongsTo(db.User, {
-      as: 'Followee',
+      as: 'followings',
       foreignKey: 'target_id',
     });
   }
