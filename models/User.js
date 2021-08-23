@@ -47,6 +47,7 @@ class User extends Sequelize.Model {
           allowNull: false,
         },
         roomId: {
+          field: 'room_id',
           type: Sequelize.STRING(150),
           allowNull: true,
         },
