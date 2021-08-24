@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM node:12.18.1
+FROM node:14.15.1
 ENV NODE_ENV=production
 
 WORKDIR /stuvel-api
