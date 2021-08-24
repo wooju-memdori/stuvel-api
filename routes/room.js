@@ -61,14 +61,11 @@ router.get('/:room/users', async (req, res) => {
 
 // 클라이언트가 특정 방에 들어갔음을 확인
 router.post('/:room', (req, res) => {
-  // 해당 방에 들어가있는 사용자들 검색
-  User.update({ roomId: req.params.room }, { where: { id: req.user.id } })
-    .then(() => {
-      res.send({ userId: req.user.id });
-    })
-    .catch(err => {
-      res.status(500).send({ err });
-    });
+  try {
+    res.send({ userId: req.user.id });
+  } catch (err) {
+    res.status(500).send({ err });
+  }
 });
 
 module.exports = router;
