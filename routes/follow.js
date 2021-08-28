@@ -47,10 +47,14 @@ router.get('/followings', async (req, res) => {
 });
 
 router.post('/follow/:id', async (req, res) => {
-  Follow.create({
-    subjectId: req.user.dataValues.id,
-    targetId: req.params.id,
-  })
+  const subjectId = req.user.dataValues.id;
+  const targetId = req.params.id;
+
+  if (Follow.findAll({ where: { subjectId, targetId } })) {
+    res.send(failed(400, '이미 팔로우하셨습니다.'));
+    return;
+  }
+  Follow.create({ subjectId, targetId })
     .then(result => {
       res.send(success(result));
     })
@@ -61,12 +65,15 @@ router.post('/follow/:id', async (req, res) => {
 });
 
 router.delete('/follow/:id', async (req, res) => {
-  Follow.destroy({
-    where: {
-      subjectId: req.user.dataValues.id,
-      targetId: req.params.id,
-    },
-  })
+  const subjectId = req.user.dataValues.id;
+  const targetId = req.params.id;
+
+  if (!Follow.findAll({ where: { subjectId, targetId } })) {
+    res.send(failed(400, '팔로우된 상태가 아닙니다.'));
+    return;
+  }
+
+  Follow.destroy({ where: { subjectId, targetId } })
     .then(result => {
       res.send(success(req.params.id));
     })
