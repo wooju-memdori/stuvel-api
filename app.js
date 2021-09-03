@@ -64,7 +64,7 @@ app.use('/', indexRouter);
 app.use('/users', userRouter);
 app.use('/room', isLoggedIn, roomRouter);
 app.use('/', isLoggedIn, followRouter);
-
+// g
 // 뷰 엔진
 app.set('view engine', 'ejs');
 
