@@ -12,7 +12,6 @@ const followRouter = require('./routes/follow');
 const passportConfig = require('./passport');
 const {
   accessTokenAuthenticater,
-  refreshTokenAuthenticater,
   isLoggedIn,
 } = require('./routes/middlewares');
 
