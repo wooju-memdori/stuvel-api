@@ -2,10 +2,13 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const { createSalt, createPassword } = require('../passport/crypto');
+const { sequelize } = require('../models');
 const Token = require('../models/Token');
 const User = require('../models/User');
+const UserTag = require('../models/UserTag');
 const { isNotLoggedIn, isLoggedIn } = require('./middlewares');
 const upload = require('../bin/multer');
+const { success, failed } = require('../common/response');
 
 const router = express.Router();
 
@@ -26,29 +29,40 @@ router.post(
       res.status(500).send(err);
     }
 
+    const newSalt = await createSalt();
+    const { password } = await createPassword(req.body.password, newSalt);
+    const t = await sequelize.transaction();
+
     try {
-      const newSalt = await createSalt();
-      const { password } = await createPassword(req.body.password, newSalt);
-      const user = User.create({
-        email: req.body.email,
-        nickname: req.body.nickname,
-        gender: req.body.gender,
-        password,
-        image: req.file?.location,
-        tag: req.body.tag,
-        salt: newSalt,
-      })
-        .then(result => {
-          console.log('데이터 추가 완료');
-          res.json({ result });
-        })
-        .catch(err => {
-          console.log('데이터 추가 실패');
-          res.json({ err });
-        });
+      // 그런 다음이 트랜잭션을 옵션으로 전달하는 몇 가지 호출을 수행합니다.
+      const user = await User.create(
+        {
+          email: req.body.email,
+          nickname: req.body.nickname,
+          gender: req.body.gender,
+          password,
+          image: req.file?.location,
+          salt: newSalt,
+        },
+        { transaction: t },
+      );
+
+      // eslint-disable-next-line no-restricted-syntax
+      for (const tag of req.body.tag) {
+        // eslint-disable-next-line no-await-in-loop
+        await UserTag.create(
+          {
+            user_id: user.id,
+            tag_id: tag,
+          },
+          { transaction: t },
+        );
+      }
+      await t.commit();
+      res.send(success(user));
     } catch (err) {
-      res.status(500).send(err);
-      console.log(err);
+      await t.rollback();
+      res.send(failed(err));
     }
   },
 );
