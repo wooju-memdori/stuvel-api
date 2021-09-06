@@ -51,6 +51,18 @@ class User extends Sequelize.Model {
           type: Sequelize.STRING(150),
           allowNull: true,
         },
+        createdAt: {
+          field: 'created_at',
+          type: Sequelize.DATE,
+          allowNull: false,
+          defaultValue: Sequelize.literal('now()'),
+        },
+        updatedAt: {
+          field: 'updated_at',
+          type: Sequelize.DATE,
+          allowNull: false,
+          defaultValue: Sequelize.literal('now()'),
+        },
       },
       {
         sequelize,

@@ -106,5 +106,5 @@ dist
 # rds access info
 models/config.json
 
-# seeders
+# seed
 config.json
