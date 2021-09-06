@@ -183,7 +183,7 @@ router.get('/', isLoggedIn, async (req, res) => {
         where: { id: req.user.dataValues.id },
         attributes: ['nickname', 'image', 'gender', 'mobumScore', 'tag'],
       });
-      res.send(success(user));
+      res.status(200).send(success(user));
     } else {
       res.status(200).json(null);
     }
