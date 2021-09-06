@@ -62,7 +62,16 @@ router.get('/:room/users', async (req, res) => {
 // 클라이언트가 특정 방에 들어갔음을 확인
 router.post('/:room', (req, res) => {
   try {
-    res.send({ userId: req.user.id });
+    res.send({
+      userInfo: {
+        id: req.user.id,
+        nickname: req.user.nickname,
+        gender: req.user.gender,
+        image: req.user.image,
+        tag: req.user.tag,
+        mobumScore: req.user.mobumScore,
+      },
+    });
   } catch (err) {
     res.status(500).send({ err });
   }
