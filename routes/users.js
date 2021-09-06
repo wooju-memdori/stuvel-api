@@ -4,8 +4,11 @@ const passport = require('passport');
 const { createSalt, createPassword } = require('../passport/crypto');
 const Token = require('../models/Token');
 const User = require('../models/User');
+// const Tag = require('../models/Tag');
+// const UserTag = require('../models/UserTag');
 const { isNotLoggedIn, isLoggedIn } = require('./middlewares');
 const upload = require('../bin/multer');
+const { success, failed } = require('../common/response');
 
 const router = express.Router();
 
@@ -171,5 +174,36 @@ router.delete('/:id', isLoggedIn, (req, res) => {
       res.send({ error });
     });
 });
+
+// 내 정보 조회 (READ)
+router.get('/', isLoggedIn, async (req, res) => {
+  try {
+    if (req.user.dataValues.id) {
+      const user = await User.findOne({
+        where: { id: req.user.dataValues.id },
+        attributes: ['nickname', 'image', 'gender', 'mobumScore', 'tag'],
+      });
+      res.send(success(user));
+    } else {
+      res.status(200).json(null);
+    }
+  } catch (error) {
+    console.error(error);
+    res.send(failed(error));
+  }
+});
+
+// router.patch('/', isLoggedIn, async (req, res) => {
+//   try {
+//     await User.update(req.body, {
+//       where: { id: req.user.dataValues.id },
+//     });
+//     res.status(200).json(req.body);
+//   } catch (error) {
+//     console.error(error);
+
+//     res.send(failed(error));
+//   }
+// });
 
 module.exports = router;
