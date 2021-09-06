@@ -14,6 +14,18 @@ class Tag extends Sequelize.Model {
           type: Sequelize.STRING(30),
           allowNull: false,
         },
+        createdAt: {
+          field: 'created_at',
+          type: Sequelize.DATE,
+          allowNull: false,
+          defaultValue: Sequelize.literal('now()'),
+        },
+        updatedAt: {
+          field: 'updated_at',
+          type: Sequelize.DATE,
+          allowNull: false,
+          defaultValue: Sequelize.literal('now()'),
+        },
       },
       {
         sequelize,
