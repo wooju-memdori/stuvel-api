@@ -181,7 +181,14 @@ router.get('/', isLoggedIn, async (req, res) => {
     if (req.user.dataValues.id) {
       const user = await User.findOne({
         where: { id: req.user.dataValues.id },
-        attributes: ['nickname', 'image', 'gender', 'mobumScore', 'tag'],
+        attributes: [
+          'nickname',
+          'email',
+          'image',
+          'gender',
+          'mobumScore',
+          'tag',
+        ],
       });
       res.status(200).send(success(user));
     } else {
@@ -193,17 +200,23 @@ router.get('/', isLoggedIn, async (req, res) => {
   }
 });
 
-// router.patch('/', isLoggedIn, async (req, res) => {
-//   try {
-//     await User.update(req.body, {
-//       where: { id: req.user.dataValues.id },
-//     });
-//     res.status(200).json(req.body);
-//   } catch (error) {
-//     console.error(error);
-
-//     res.send(failed(error));
-//   }
-// });
+router.patch('/', isLoggedIn, async (req, res) => {
+  try {
+    await User.update(
+      {
+        nickname: req.body.data?.nickname,
+        password: req.body.data?.password,
+        tags: req.body.data?.tags,
+      },
+      {
+        where: { id: req.user.dataValues.id },
+      },
+    );
+    res.status(200).json(req.body);
+  } catch (error) {
+    console.error(error);
+    res.send(failed(error));
+  }
+});
 
 module.exports = router;
