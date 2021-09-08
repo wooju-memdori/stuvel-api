@@ -109,6 +109,17 @@ chatIo.on('connect', socket => {
 
     callback();
   });
+
+  socket.on('disconnect', () => {
+    const user = removeUser(socket.id);
+
+    if (user) {
+      chatIo.to(user.room).emit('roomData', {
+        room: user.room,
+        users: getUsersInRoom(user.room),
+      });
+    }
+  });
 });
 
 const options = {
