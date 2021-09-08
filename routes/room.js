@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
 
         Room.create({
           id: roomId,
-          joined_count: 1,
+          joined_count: 0,
         })
           .then(() => {
             console.log('데이터 추가 완료 - ', roomId);
