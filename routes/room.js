@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
 
         Room.create({
           id: roomId,
-          joined_count: 1,
+          joined_count: 0,
         })
           .then(() => {
             console.log('데이터 추가 완료 - ', roomId);
@@ -62,7 +62,16 @@ router.get('/:room/users', async (req, res) => {
 // 클라이언트가 특정 방에 들어갔음을 확인
 router.post('/:room', (req, res) => {
   try {
-    res.send({ userId: req.user.id });
+    res.send({
+      userInfo: {
+        id: req.user.id,
+        nickname: req.user.nickname,
+        gender: req.user.gender,
+        image: req.user.image,
+        tag: req.user.tag,
+        mobumScore: req.user.mobumScore,
+      },
+    });
   } catch (err) {
     res.status(500).send({ err });
   }

@@ -38,8 +38,16 @@ app.set('port', ports.stuvel);
 PeerServer({ port: ports.peer, path: '/' });
 
 room.on('connection', socket => {
-  socket.on('join-room', async (roomId, userPeerId, userId) => {
-    console.log('roomId', roomId, 'userPeerId', userPeerId, 'userId', userId);
+  socket.on('join-room', async (roomId, userPeerId, userInfo) => {
+    console.log(
+      'roomId',
+      roomId,
+      'userPeerId',
+      userPeerId,
+      'userInfo',
+      userInfo,
+    );
+    const userId = userInfo.id;
     socket.join(roomId);
     User.update({ roomId }, { where: { id: userId } });
     const { joined_count: joinedCountConnected } = await Room.findOne({
@@ -58,7 +66,7 @@ room.on('connection', socket => {
       .catch(err => {
         console.log(err);
       });
-    socket.to(roomId).emit('user-connected', userPeerId); // send a message to the all in the room except me
+    socket.to(roomId).emit('user-connected', userPeerId, userInfo); // send a message to the all in the room except me
     socket.on('disconnect', async () => {
       User.update({ roomId: null }, { where: { id: userId } });
       const { joined_count: joinedCountDisconnected } = await Room.findOne({
