@@ -77,6 +77,24 @@ roomIo.on('connection', socket => {
   });
 });
 
+chatIo.on('connect', socket => {
+  socket.on('join', ({ name, room }, callback) => {
+    const { error, user } = addUser({ id: socket.id, name, room });
+
+    if (error) return callback(error);
+
+    socket.join(user.room);
+
+    chatIo.to(user.room).emit('roomData', {
+      room: user.room,
+      users: getUsersInRoom(user.room),
+    });
+
+    callback();
+    return 0;
+  });
+});
+
 const options = {
   host: '0.0.0.0',
   port: ports.stuvel,
