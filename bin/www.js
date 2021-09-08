@@ -6,6 +6,7 @@ const dotenv = require('dotenv');
 const { Op, Sequelize } = require('sequelize');
 const Room = require('../models/Room');
 const User = require('../models/User');
+const { addUser, removeUser, getUser, getUsersInRoom } = require('./users');
 
 dotenv.config({
   path: path.resolve(
@@ -26,7 +27,8 @@ const io = socketIO(server, {
   },
 });
 
-const room = io.of('room');
+const roomIo = io.of('room');
+const chatIo = io.of('chat');
 
 const ports = {
   stuvel: 3000,
@@ -37,7 +39,7 @@ app.set('port', ports.stuvel);
 
 PeerServer({ port: ports.peer, path: '/' });
 
-room.on('connection', socket => {
+roomIo.on('connection', socket => {
   socket.on('join-room', async (roomId, userPeerId, userId) => {
     console.log('roomId', roomId, 'userPeerId', userPeerId, 'userId', userId);
     socket.join(roomId);
