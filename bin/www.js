@@ -93,6 +93,22 @@ chatIo.on('connect', socket => {
     callback();
     return 0;
   });
+
+  socket.on('sendMessage', (message, callback) => {
+    const user = getUser(socket.id);
+    const timeSent = new Date();
+
+    /* eslint-disable */
+    chatIo.to(user.room).emit('message', {
+      user: user.name,
+      text: message,
+      time: `${('0' + timeSent.getHours()).slice(-2)}:${(
+        '0' + timeSent.getMinutes()
+      ).slice(-2)}`,
+    });
+
+    callback();
+  });
 });
 
 const options = {
