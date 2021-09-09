@@ -6,6 +6,7 @@ const dotenv = require('dotenv');
 const { Op, Sequelize } = require('sequelize');
 const Room = require('../models/Room');
 const User = require('../models/User');
+const { addUser, removeUser, getUser, getUsersInRoom } = require('./chatUsers');
 
 dotenv.config({
   path: path.resolve(
@@ -26,7 +27,8 @@ const io = socketIO(server, {
   },
 });
 
-const room = io.of('room');
+const roomIo = io.of('room');
+const chatIo = io.of('chat');
 
 const ports = {
   stuvel: 3000,
@@ -37,7 +39,7 @@ app.set('port', ports.stuvel);
 
 PeerServer({ port: ports.peer, path: '/' });
 
-room.on('connection', socket => {
+roomIo.on('connection', socket => {
   socket.on('join-room', async (roomId, userPeerId, userInfo) => {
     console.log(
       'roomId',
@@ -80,6 +82,51 @@ room.on('connection', socket => {
       );
       socket.to(roomId).emit('user-disconnected', userPeerId);
     });
+  });
+});
+
+chatIo.on('connect', socket => {
+  socket.on('join', ({ name, room }, callback) => {
+    const { error, user } = addUser({ id: socket.id, name, room });
+
+    if (error) return callback(error);
+
+    socket.join(user.room);
+
+    chatIo.to(user.room).emit('roomData', {
+      room: user.room,
+      users: getUsersInRoom(user.room),
+    });
+
+    callback();
+    return 0;
+  });
+
+  socket.on('sendMessage', (message, callback) => {
+    const user = getUser(socket.id);
+    const timeSent = new Date();
+
+    /* eslint-disable */
+    chatIo.to(user.room).emit('message', {
+      user: user.name,
+      text: message,
+      time: `${('0' + timeSent.getHours()).slice(-2)}:${(
+        '0' + timeSent.getMinutes()
+      ).slice(-2)}`,
+    });
+
+    callback();
+  });
+
+  socket.on('disconnect', () => {
+    const user = removeUser(socket.id);
+
+    if (user) {
+      chatIo.to(user.room).emit('roomData', {
+        room: user.room,
+        users: getUsersInRoom(user.room),
+      });
+    }
   });
 });
 
