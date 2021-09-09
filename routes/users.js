@@ -202,11 +202,11 @@ router.get('/', isLoggedIn, async (req, res) => {
 
 router.patch('/', isLoggedIn, async (req, res) => {
   try {
+    console.log('츄라이');
+    console.log(req.body.nickname);
     await User.update(
       {
-        nickname: req.body.data?.nickname,
-        password: req.body.data?.password,
-        tags: req.body.data?.tags,
+        nickname: req.body.nickname,
       },
       {
         where: { id: req.user.dataValues.id },
