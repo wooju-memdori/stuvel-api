@@ -6,7 +6,7 @@ const dotenv = require('dotenv');
 const { Op, Sequelize } = require('sequelize');
 const Room = require('../models/Room');
 const User = require('../models/User');
-const { addUser, removeUser, getUser, getUsersInRoom } = require('./users');
+const { addUser, removeUser, getUser, getUsersInRoom } = require('./chatUsers');
 
 dotenv.config({
   path: path.resolve(
