@@ -202,8 +202,6 @@ router.get('/', isLoggedIn, async (req, res) => {
 
 router.patch('/', isLoggedIn, async (req, res) => {
   try {
-    console.log('츄라이');
-    console.log(req.body.nickname);
     await User.update(
       {
         nickname: req.body.nickname,
