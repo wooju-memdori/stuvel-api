@@ -200,7 +200,8 @@ router.get('/', isLoggedIn, async (req, res) => {
   }
 });
 
-router.patch('/', isLoggedIn, async (req, res) => {
+// 닉네임 변경
+router.patch('/nickname', isLoggedIn, async (req, res) => {
   try {
     await User.update(
       {
@@ -214,6 +215,47 @@ router.patch('/', isLoggedIn, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.send(failed(error));
+  }
+});
+
+// 비밀번호 변경
+router.patch('/password', isLoggedIn, async (req, res) => {
+  try {
+    // 'local' 전략 수행 후 성공/실패 시 호출되는 커스텀 콜백 구현
+    passport.authenticate(
+      'local',
+      { session: false },
+      async (err, user, info) => {
+        if (err) {
+          // server err
+          return res.status(500).send(err.message);
+        }
+        if (info) {
+          // client err
+          return res.status(401).send(info.reason);
+        }
+        const newSalt = await createSalt();
+        const { password } = await createPassword(
+          req.body.newPassword,
+          newSalt,
+        );
+
+        await User.update(
+          {
+            password,
+
+            salt: newSalt,
+          },
+          {
+            where: { id: req.user.dataValues.id },
+          },
+        );
+        return res.status(200).send('비밀번호 변경 완료');
+      },
+    )(req, res);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(err);
   }
 });
 
