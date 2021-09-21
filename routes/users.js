@@ -218,10 +218,27 @@ router.patch('/nickname', isLoggedIn, async (req, res) => {
   }
 });
 
+// 관심사 변경
+router.patch('/interests', isLoggedIn, async (req, res) => {
+  try {
+    await User.update(
+      {
+        tag: req.body,
+      },
+      {
+        where: { id: req.user.dataValues.id },
+      },
+    );
+    res.status(200).json(req.body);
+  } catch (err) {
+    console.error(err);
+    res.send(failed(err.message));
+  }
+});
+
 // 비밀번호 변경
 router.patch('/password', isLoggedIn, async (req, res) => {
   try {
-    // 'local' 전략 수행 후 성공/실패 시 호출되는 커스텀 콜백 구현
     passport.authenticate(
       'local',
       { session: false },
@@ -239,11 +256,9 @@ router.patch('/password', isLoggedIn, async (req, res) => {
           req.body.newPassword,
           newSalt,
         );
-
         await User.update(
           {
             password,
-
             salt: newSalt,
           },
           {
