@@ -4,8 +4,8 @@ const passport = require('passport');
 const { createSalt, createPassword } = require('../passport/crypto');
 const Token = require('../models/Token');
 const User = require('../models/User');
-// const Tag = require('../models/Tag');
-// const UserTag = require('../models/UserTag');
+const Tag = require('../models/Tag');
+const UserTag = require('../models/UserTag');
 const { isNotLoggedIn, isLoggedIn } = require('./middlewares');
 const upload = require('../bin/multer');
 const { success, failed } = require('../common/response');
@@ -213,14 +213,19 @@ router.patch('/nickname', isLoggedIn, async (req, res) => {
 // 관심사 변경
 router.patch('/interests', isLoggedIn, async (req, res) => {
   try {
-    await User.update(
-      {
-        tag: req.body,
+    await UserTag.destroy({
+      where: {
+        user_id: req.user.dataValues.id,
       },
-      {
-        where: { id: req.user.dataValues.id },
-      },
-    );
+    });
+    req.body.forEach(async tag => {
+      await UserTag.create({
+        userId: req.user.dataValues.id,
+        user_id: req.user.dataValues.id,
+        tagId: +tag,
+        tag_id: +tag,
+      });
+    });
     res.status(200).json(req.body);
   } catch (err) {
     console.error(err);
