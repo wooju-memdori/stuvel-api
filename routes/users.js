@@ -38,7 +38,6 @@ router.post(
         gender: req.body.gender,
         password,
         image: req.file?.location,
-        tag: req.body.tag,
         salt: newSalt,
       })
         .then(result => {
@@ -181,14 +180,7 @@ router.get('/', isLoggedIn, async (req, res) => {
     if (req.user.dataValues.id) {
       const user = await User.findOne({
         where: { id: req.user.dataValues.id },
-        attributes: [
-          'nickname',
-          'email',
-          'image',
-          'gender',
-          'mobumScore',
-          'tag',
-        ],
+        attributes: ['nickname', 'email', 'image', 'gender', 'mobumScore'],
       });
       res.status(200).send(success(user));
     } else {

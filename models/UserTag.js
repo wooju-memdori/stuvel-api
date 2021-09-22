@@ -4,7 +4,32 @@ class UserTag extends Sequelize.Model {
   static init(sequelize) {
     // 모델 동기화를 위한 부모 model의 init 메서드 호출
     return super.init(
-      {},
+      {
+        userId: {
+          field: 'user_id',
+          type: Sequelize.INTEGER,
+          unique: true,
+          allowNull: false,
+        },
+        tagId: {
+          field: 'tag_id',
+          type: Sequelize.INTEGER,
+          unique: true,
+          allowNull: false,
+        },
+        createdAt: {
+          field: 'created_at',
+          type: Sequelize.DATE,
+          allowNull: false,
+          defaultValue: Sequelize.literal('now()'),
+        },
+        updatedAt: {
+          field: 'updated_at',
+          type: Sequelize.DATE,
+          allowNull: false,
+          defaultValue: Sequelize.literal('now()'),
+        },
+      },
       {
         sequelize,
         timestamps: true, // 속성값이 true일 경우, createdAt과 updatedAt 컬럼이 자동 추가되며 생성/수정 시간 기록

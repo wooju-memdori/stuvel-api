@@ -48,7 +48,7 @@ router.get('/', async (req, res) => {
 router.get('/:room/users', async (req, res) => {
   // 해당 방에 들어가있는 사용자들 검색
   await User.findAll({
-    attributes: ['nickname', 'gender', 'image', 'tag', 'level', 'mobum_score'],
+    attributes: ['nickname', 'gender', 'image', 'level', 'mobum_score'],
     where: { roomId: req.params.room },
   })
     .then(users => {
@@ -68,7 +68,6 @@ router.post('/:room', (req, res) => {
         nickname: req.user.nickname,
         gender: req.user.gender,
         image: req.user.image,
-        tag: req.user.tag,
         mobumScore: req.user.mobumScore,
       },
     });

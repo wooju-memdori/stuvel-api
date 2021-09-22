@@ -27,10 +27,6 @@ class User extends Sequelize.Model {
           allowNull: true,
           unique: true,
         },
-        tag: {
-          type: Sequelize.STRING(20),
-          allowNull: true,
-        },
         level: {
           type: Sequelize.INTEGER,
           allowNull: false,
