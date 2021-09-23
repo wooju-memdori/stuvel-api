@@ -118,6 +118,8 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
             maxAge: 1000 * 60 * 60 * 24 * 14,
           });
           res.json({ accessToken, userId: user.id });
+          // refreshToken도 payload로 보내기
+          // res.json({ accessToken, userId: user.id, refreshToken });
         });
       },
     )(req, res, next);
@@ -128,7 +130,7 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
 });
 
 // accessToken 연장
-router.post('/silent-refresh', isLoggedIn, (req, res, next) => {
+router.post('/silent-refresh', (req, res, next) => {
   // 'local' 전략 수행 후 성공/실패 시 호출되는 커스텀 콜백 구현
   passport.authenticate('refreshToken', { sessions: false }, (error, user) => {
     if (user) {
