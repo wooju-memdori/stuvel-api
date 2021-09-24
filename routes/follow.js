@@ -2,23 +2,31 @@ const express = require('express');
 const Follow = require('../models/Follow');
 const User = require('../models/User');
 const { success, failed } = require('../common/response');
+const { sequelize } = require('../models');
 
 const router = express.Router();
 
 router.get('/followers', async (req, res) => {
-  Follow.findAll({
-    include: [
-      {
-        model: User,
-        as: 'followers',
-        attributes: ['id', 'nickname', 'image', 'roomId'],
-      },
-    ],
-    where: { targetId: req.user.dataValues.id },
-  })
+  sequelize
+    .query(
+      `
+      select
+        u.nickname,
+        u.image,
+        u.room_id,
+        if(f2.subject_id is null, false, true) as following
+      from follow f
+        inner join user u on u.id = f.subject_id
+        left outer join follow f2 on f.target_id = f2.subject_id and f2.target_id = f.subject_id
+      where f.target_id = ${req.user.dataValues.id};`,
+      { type: sequelize.QueryTypes.SELECT },
+    )
     .then(result => {
-      const response = result.map(item => item.followers);
-      res.send(success(response));
+      const parsedResult = result.map(item => ({
+        ...item,
+        following: Boolean(item.following),
+      }));
+      res.send(success(parsedResult));
     })
     .catch(err => {
       console.log(failed(err));
