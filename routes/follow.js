@@ -40,13 +40,19 @@ router.get('/followings', async (req, res) => {
       {
         model: User,
         as: 'followings',
-        attributes: ['id', 'email', 'nickname', 'image', 'roomId'],
+        attributes: ['id', 'nickname', 'image', 'roomId'],
       },
     ],
     where: { subjectId: req.user.dataValues.id },
   })
     .then(result => {
-      const response = result.map(item => item.followings);
+      const response = result.map(item => ({
+        id: item.followings.id,
+        nickname: item.followings.nickname,
+        image: item.followings.image,
+        roomId: item.followings.roomId,
+        following: true,
+      }));
       res.send(success(response));
     })
     .catch(err => {
