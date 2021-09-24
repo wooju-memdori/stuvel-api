@@ -118,14 +118,12 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
             maxAge: 1000 * 60 * 60 * 24 * 14,
           });
           res.json({ accessToken, userId: user.id });
-          // refreshToken도 payload로 보내기
-          // res.json({ accessToken, userId: user.id, refreshToken });
         });
       },
     )(req, res, next);
   } catch (err) {
     console.log(err);
-    next(err);
+    res.send(failed(err));
   }
 });
 
@@ -135,7 +133,7 @@ router.post('/silent-refresh', (req, res, next) => {
   passport.authenticate('refreshToken', { sessions: false }, (error, user) => {
     if (user) {
       const accessToken = jwt.sign(
-        { userSeq: user.seq },
+        { userId: user.id },
         process.env.JWT_SECRET,
         {
           expiresIn: '2d',

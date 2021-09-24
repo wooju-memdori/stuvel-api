@@ -25,6 +25,7 @@ app.use(morgan('dev'));
 
 const corsOptions = {
   origin: process.env.STUVEL_CLIENT,
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
 };
 
