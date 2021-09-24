@@ -11,7 +11,7 @@ router.get('/followers', async (req, res) => {
       {
         model: User,
         as: 'followers',
-        attributes: ['id', 'email', 'nickname', 'image', 'roomId'],
+        attributes: ['id', 'nickname', 'image', 'roomId'],
       },
     ],
     where: { targetId: req.user.dataValues.id },
