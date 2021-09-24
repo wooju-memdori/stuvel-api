@@ -162,6 +162,17 @@ router.get('/:id', isLoggedIn, async (req, res) => {
     });
 });
 
+// 로그아웃 (로그인상태에서만 접근 가능)
+router.delete('/logout', isLoggedIn, (req, res, next) => {
+  Token.destroy({ where: { userId: req.user.id } })
+    .then(() => {
+      res.send(success());
+    })
+    .catch(err => {
+      res.send(failed(err));
+    });
+});
+
 // 회원 삭제 (DELETE)
 router.delete('/:id', isLoggedIn, (req, res) => {
   Token.destroy({ where: { userId: req.params.id } });
