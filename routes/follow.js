@@ -11,6 +11,7 @@ router.get('/followers', async (req, res) => {
     .query(
       `
       select
+        u.id,
         u.nickname,
         u.image,
         u.room_id,
