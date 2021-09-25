@@ -5,6 +5,7 @@ const Room = require('./Room');
 const Follow = require('./Follow');
 const Tag = require('./Tag');
 const UserTag = require('./UserTag');
+const Message = require('./Message');
 
 const db = {};
 
@@ -30,6 +31,7 @@ db.Room = Room;
 db.Tag = Tag;
 db.Follow = Follow;
 db.UserTag = UserTag;
+db.Message = Message;
 
 Follow.init(sequelize);
 User.init(sequelize);
@@ -37,6 +39,7 @@ Token.init(sequelize);
 Room.init(sequelize);
 Tag.init(sequelize);
 UserTag.init(sequelize);
+Message.init(sequelize);
 
 Follow.associate(db);
 User.associate(db);
@@ -44,5 +47,6 @@ Token.associate(db);
 Room.associate(db);
 Tag.associate(db);
 UserTag.associate(db);
+Message.associate(db);
 
 module.exports = db;
