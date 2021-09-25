@@ -91,6 +91,10 @@ class User extends Sequelize.Model {
       as: 'followings',
       foreignKey: 'target_id',
     });
+    db.User.belongsToMany(db.TextChatRoom, {
+      through: 'TextChatRoomUser',
+      foreignKey: 'user_id',
+    });
   }
 }
 

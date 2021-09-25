@@ -6,6 +6,8 @@ const Follow = require('./Follow');
 const Tag = require('./Tag');
 const UserTag = require('./UserTag');
 const Message = require('./Message');
+const TextChatRoom = require('./TextChatRoom');
+const TextChatRoomUser = require('./TextChatRoomUser');
 
 const db = {};
 
@@ -32,6 +34,8 @@ db.Tag = Tag;
 db.Follow = Follow;
 db.UserTag = UserTag;
 db.Message = Message;
+db.TextChatRoom = TextChatRoom;
+db.TextChatRoomUser = TextChatRoomUser;
 
 Follow.init(sequelize);
 User.init(sequelize);
@@ -40,6 +44,8 @@ Room.init(sequelize);
 Tag.init(sequelize);
 UserTag.init(sequelize);
 Message.init(sequelize);
+TextChatRoom.init(sequelize);
+TextChatRoomUser.init(sequelize);
 
 Follow.associate(db);
 User.associate(db);
@@ -48,5 +54,7 @@ Room.associate(db);
 Tag.associate(db);
 UserTag.associate(db);
 Message.associate(db);
+TextChatRoom.associate(db);
+TextChatRoomUser.associate(db);
 
 module.exports = db;
