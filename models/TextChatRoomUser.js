@@ -5,9 +5,9 @@ class TextChatRoomUser extends Sequelize.Model {
     // 모델 동기화를 위한 부모 model의 init 메서드 호출
     return super.init(
       {
-        roomId: {
-          field: 'room_id',
-          type: Sequelize.STRING(150),
+        textChatRoomId: {
+          field: 'text_chat_room_id',
+          type: Sequelize.INTEGER,
           primaryKey: true,
         },
         userId: {
@@ -42,8 +42,8 @@ class TextChatRoomUser extends Sequelize.Model {
 
   // 다른 모델과의 관계를 서술하는 associate 메서드
   static associate(db) {
-    db.TextChatRoomUser.belongsTo(db.Room, {
-      foreignKey: 'room_id',
+    db.TextChatRoomUser.belongsTo(db.TextChatRoom, {
+      foreignKey: 'text_chat_room_id',
     });
     db.TextChatRoomUser.belongsTo(db.User, {
       foreignKey: 'user_id',

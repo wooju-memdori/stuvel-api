@@ -33,9 +33,9 @@ db.Room = Room;
 db.Tag = Tag;
 db.Follow = Follow;
 db.UserTag = UserTag;
-db.Message = Message;
 db.TextChatRoom = TextChatRoom;
 db.TextChatRoomUser = TextChatRoomUser;
+db.Message = Message;
 
 Follow.init(sequelize);
 User.init(sequelize);
@@ -43,9 +43,9 @@ Token.init(sequelize);
 Room.init(sequelize);
 Tag.init(sequelize);
 UserTag.init(sequelize);
-Message.init(sequelize);
 TextChatRoom.init(sequelize);
 TextChatRoomUser.init(sequelize);
+Message.init(sequelize);
 
 Follow.associate(db);
 User.associate(db);
@@ -53,8 +53,8 @@ Token.associate(db);
 Room.associate(db);
 Tag.associate(db);
 UserTag.associate(db);
-Message.associate(db);
 TextChatRoom.associate(db);
 TextChatRoomUser.associate(db);
+Message.associate(db);
 
 module.exports = db;

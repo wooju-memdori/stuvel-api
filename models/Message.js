@@ -19,6 +19,11 @@ class Message extends Sequelize.Model {
           type: Sequelize.INTEGER,
           allowNull: true,
         },
+        textChatRoomId: {
+          field: 'text_chat_room_id',
+          type: Sequelize.INTEGER,
+          allowNull: false,
+        },
         parentMessageId: {
           field: 'parent_message_id',
           type: Sequelize.INTEGER,
@@ -53,6 +58,10 @@ class Message extends Sequelize.Model {
     db.Message.belongsTo(db.Message, {
       foreignKey: 'parent_message_id',
       as: 'parent',
+    });
+    db.Message.belongsTo(db.TextChatRoom, {
+      foreignKey: 'text_chat_room_id',
+      as: 'room',
     });
     db.Message.belongsTo(db.User, {
       foreignKey: 'user_id',

@@ -26,8 +26,8 @@ class TextChatRoom extends Sequelize.Model {
       {
         sequelize,
         timestamps: true, // 속성값이 true일 경우, createdAt과 updatedAt 컬럼이 자동 추가되며 생성/수정 시간 기록
-        modelName: 'Room', // 모델 이름 설정
-        tableName: 'room', // 실제 데이터베이스의 테이블 이름, 명명규칙: 소문자 및 복수형
+        modelName: 'TextChatRoom', // 모델 이름 설정
+        tableName: 'text_chat_room', // 실제 데이터베이스의 테이블 이름, 명명규칙: 소문자 및 복수형
         paranoid: true, // true 로 설정 시 deletedAt 컬럼이 생성되며 로우 삭제 시 deletedAt 컬럼에 지운 시각이 기록됨, 로우 복원 상황이 필요할 경우 true 로 설정
         underscored: true,
         charset: 'utf8mb4',
@@ -38,11 +38,14 @@ class TextChatRoom extends Sequelize.Model {
 
   // 다른 모델과의 관계를 서술하는 associate
   static associate(db) {
-    db.Room.hasMany(db.User, { foreignKey: 'room_id', sourceKey: 'id' });
-    db.Room.belongsToMany(db.User, {
+    db.TextChatRoom.hasMany(db.Message, {
+      as: 'messages',
+      foreignKey: 'text_chat_room_id',
+    });
+    db.TextChatRoom.belongsToMany(db.User, {
       through: 'TextChatRoomUser',
       as: 'participants',
-      foreignKey: 'room_id',
+      foreignKey: 'text_chat_room_id',
     });
   }
 }
