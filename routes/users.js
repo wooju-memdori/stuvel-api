@@ -122,17 +122,17 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
     )(req, res, next);
   } catch (err) {
     console.log(err);
-    next(err);
+    res.send(failed(err));
   }
 });
 
 // accessToken 연장
-router.post('/silent-refresh', isLoggedIn, (req, res, next) => {
+router.post('/silent-refresh', (req, res, next) => {
   // 'local' 전략 수행 후 성공/실패 시 호출되는 커스텀 콜백 구현
   passport.authenticate('refreshToken', { sessions: false }, (error, user) => {
     if (user) {
       const accessToken = jwt.sign(
-        { userSeq: user.seq },
+        { userId: user.id },
         process.env.JWT_SECRET,
         {
           expiresIn: '2d',
@@ -192,6 +192,17 @@ router.get('/:id', isLoggedIn, async (req, res) => {
     })
     .catch(error => {
       res.send({ error });
+    });
+});
+
+// 로그아웃 (로그인상태에서만 접근 가능)
+router.delete('/logout', isLoggedIn, (req, res, next) => {
+  Token.destroy({ where: { userId: req.user.id } })
+    .then(() => {
+      res.send(success());
+    })
+    .catch(err => {
+      res.send(failed(err));
     });
 });
 

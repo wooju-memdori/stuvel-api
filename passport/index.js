@@ -69,6 +69,7 @@ const accessTokenVerify = async (jwtPayload /* 토큰의 데이터 부분 */, do
 // refreshToken 인증 strategy
 const refreshTokenVerify = async (req, done) => {
   if (!req.cookies.refreshToken) {
+    console.log('refreshToken 없음');
     done(null, false, { reason: 'refreshToken 없음' });
     return;
   }
@@ -83,10 +84,12 @@ const refreshTokenVerify = async (req, done) => {
       process.env.JWT_SECRET,
     );
     if (!refreshToken || !decoded) {
+      console.log('올바르지 않은 refreshToken 입니다.');
       done(null, false, { reason: '올바르지 않은 refreshToken 입니다.' });
       return;
     }
   } catch (err) {
+    console.log(err);
     done(null, false, { reason: '올바르지 않은 refreshToken 입니다.' });
     return;
   }
