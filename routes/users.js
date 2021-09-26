@@ -4,8 +4,8 @@ const passport = require('passport');
 const { createSalt, createPassword } = require('../passport/crypto');
 const Token = require('../models/Token');
 const User = require('../models/User');
-// const Tag = require('../models/Tag');
-// const UserTag = require('../models/UserTag');
+const Tag = require('../models/Tag');
+const UserTag = require('../models/UserTag');
 const { isNotLoggedIn, isLoggedIn } = require('./middlewares');
 const upload = require('../bin/multer');
 const { success, failed } = require('../common/response');
@@ -81,7 +81,6 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
               expiresIn: '14d',
             },
           );
-
           // DB에 refreshToken가 있으면 업데이트, 없으면 저장
           Token.findOne({ where: { userId: user.id } }).then(result => {
             if (result) {
@@ -94,11 +93,11 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
                 content: refreshToken,
                 userId: user.id,
               })
-                .then(result => {
+                .then(() => {
                   console.log('데이터 추가 완료');
                 })
-                .catch(err => {
-                  console.log(err);
+                .catch(error => {
+                  console.log(error);
                   console.log('데이터 추가 실패');
                 });
             }
@@ -147,9 +146,43 @@ router.post('/silent-refresh', (req, res, next) => {
   })(req, res, next);
 });
 
+// 내 정보 조회 (READ)
+router.get('/', isLoggedIn, async (req, res) => {
+  try {
+    if (req.user.dataValues.id) {
+      const user = await User.findOne({
+        where: { id: req.user.dataValues.id },
+        attributes: ['nickname', 'email', 'image', 'gender', 'mobumScore'],
+      });
+      const tags = await UserTag.findAll({
+        where: req.user.dataValues.id,
+        attributes: ['tag_id'],
+        include: [
+          {
+            model: Tag,
+            attributes: ['id', 'name', 'category'],
+          },
+        ],
+      });
+      if (user && tags) {
+        const fullUser = user.toJSON();
+        fullUser.tag = tags;
+        res.status(200).send(success(fullUser));
+      } else {
+        res.status(404).send('나의 정보를 찾지 못했습니다.');
+      }
+    } else {
+      res.status(200).json(null);
+    }
+  } catch (error) {
+    console.error(error);
+    res.send(failed(error));
+  }
+});
+
 // 회원 조회 (READ)
 router.get('/:id', isLoggedIn, async (req, res) => {
-  const user = await User.findOne({ where: { id: req.params.id } })
+  await User.findOne({ where: { id: req.params.id } })
     .then(user => {
       if (!user) {
         res.send({ message: '해당 사용자가 없습니다.' });
@@ -185,25 +218,8 @@ router.delete('/:id', isLoggedIn, (req, res) => {
     });
 });
 
-// 내 정보 조회 (READ)
-router.get('/', isLoggedIn, async (req, res) => {
-  try {
-    if (req.user.dataValues.id) {
-      const user = await User.findOne({
-        where: { id: req.user.dataValues.id },
-        attributes: ['nickname', 'email', 'image', 'gender', 'mobumScore'],
-      });
-      res.status(200).send(success(user));
-    } else {
-      res.status(200).json(null);
-    }
-  } catch (error) {
-    console.error(error);
-    res.send(failed(error));
-  }
-});
-
-router.patch('/', isLoggedIn, async (req, res) => {
+// 닉네임 변경
+router.patch('/nickname', isLoggedIn, async (req, res) => {
   try {
     await User.update(
       {
@@ -217,6 +233,68 @@ router.patch('/', isLoggedIn, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.send(failed(error));
+  }
+});
+
+// 관심사 변경
+router.patch('/interests', isLoggedIn, async (req, res) => {
+  try {
+    await UserTag.destroy({
+      where: {
+        user_id: req.user.dataValues.id,
+      },
+    });
+    const promisesToRun = req.body.map(tag =>
+      UserTag.create({
+        // userId: req.user.dataValues.id,
+        user_id: req.user.dataValues.id,
+        // tagId: +tag,
+        tag_id: +tag,
+      }),
+    );
+    await Promise.all(promisesToRun);
+    res.status(200).json(req.body);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(failed(err.message));
+  }
+});
+
+// 비밀번호 변경
+router.patch('/password', isLoggedIn, async (req, res) => {
+  try {
+    passport.authenticate(
+      'local',
+      { session: false },
+      async (err, user, info) => {
+        if (err) {
+          // server err
+          return res.status(500).send(err.message);
+        }
+        if (info) {
+          // client err
+          return res.status(401).send(info.reason);
+        }
+        const newSalt = await createSalt();
+        const { password } = await createPassword(
+          req.body.newPassword,
+          newSalt,
+        );
+        await User.update(
+          {
+            password,
+            salt: newSalt,
+          },
+          {
+            where: { id: req.user.dataValues.id },
+          },
+        );
+        return res.status(200).send('비밀번호 변경 완료');
+      },
+    )(req, res);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(err);
   }
 });
 
