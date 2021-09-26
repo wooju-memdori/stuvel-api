@@ -5,13 +5,15 @@ class UserTag extends Sequelize.Model {
     // 모델 동기화를 위한 부모 model의 init 메서드 호출
     return super.init(
       {
-        userId: {
+        // userId: {
+        user_id: {
           field: 'user_id',
           type: Sequelize.INTEGER,
           unique: true,
           allowNull: false,
         },
-        tagId: {
+        // tagId: {
+        tag_id: {
           field: 'tag_id',
           type: Sequelize.INTEGER,
           unique: true,

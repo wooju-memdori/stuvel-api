@@ -81,7 +81,6 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
               expiresIn: '14d',
             },
           );
-
           // DB에 refreshToken가 있으면 업데이트, 없으면 저장
           Token.findOne({ where: { userId: user.id } }).then(result => {
             if (result) {
@@ -94,11 +93,11 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
                 content: refreshToken,
                 userId: user.id,
               })
-                .then(result => {
+                .then(() => {
                   console.log('데이터 추가 완료');
                 })
-                .catch(err => {
-                  console.log(err);
+                .catch(error => {
+                  console.log(error);
                   console.log('데이터 추가 실패');
                 });
             }
@@ -147,9 +146,43 @@ router.post('/silent-refresh', isLoggedIn, (req, res, next) => {
   })(req, res, next);
 });
 
+// 내 정보 조회 (READ)
+router.get('/', isLoggedIn, async (req, res) => {
+  try {
+    if (req.user.dataValues.id) {
+      const user = await User.findOne({
+        where: { id: req.user.dataValues.id },
+        attributes: ['nickname', 'email', 'image', 'gender', 'mobumScore'],
+      });
+      const tags = await UserTag.findAll({
+        where: req.user.dataValues.id,
+        attributes: ['tag_id'],
+        include: [
+          {
+            model: Tag,
+            attributes: ['id', 'name', 'category'],
+          },
+        ],
+      });
+      if (user && tags) {
+        const fullUser = user.toJSON();
+        fullUser.tag = tags;
+        res.status(200).send(success(fullUser));
+      } else {
+        res.status(404).send('나의 정보를 찾지 못했습니다.');
+      }
+    } else {
+      res.status(200).json(null);
+    }
+  } catch (error) {
+    console.error(error);
+    res.send(failed(error));
+  }
+});
+
 // 회원 조회 (READ)
 router.get('/:id', isLoggedIn, async (req, res) => {
-  const user = await User.findOne({ where: { id: req.params.id } })
+  await User.findOne({ where: { id: req.params.id } })
     .then(user => {
       if (!user) {
         res.send({ message: '해당 사용자가 없습니다.' });
@@ -172,24 +205,6 @@ router.delete('/:id', isLoggedIn, (req, res) => {
     .catch(error => {
       res.send({ error });
     });
-});
-
-// 내 정보 조회 (READ)
-router.get('/', isLoggedIn, async (req, res) => {
-  try {
-    if (req.user.dataValues.id) {
-      const user = await User.findOne({
-        where: { id: req.user.dataValues.id },
-        attributes: ['nickname', 'email', 'image', 'gender', 'mobumScore'],
-      });
-      res.status(200).send(success(user));
-    } else {
-      res.status(200).json(null);
-    }
-  } catch (error) {
-    console.error(error);
-    res.send(failed(error));
-  }
 });
 
 // 닉네임 변경
@@ -218,18 +233,19 @@ router.patch('/interests', isLoggedIn, async (req, res) => {
         user_id: req.user.dataValues.id,
       },
     });
-    req.body.forEach(async tag => {
-      await UserTag.create({
-        userId: req.user.dataValues.id,
+    const promisesToRun = req.body.map(tag =>
+      UserTag.create({
+        // userId: req.user.dataValues.id,
         user_id: req.user.dataValues.id,
-        tagId: +tag,
+        // tagId: +tag,
         tag_id: +tag,
-      });
-    });
+      }),
+    );
+    await Promise.all(promisesToRun);
     res.status(200).json(req.body);
   } catch (err) {
     console.error(err);
-    res.send(failed(err.message));
+    res.status(500).send(failed(err.message));
   }
 });
 
