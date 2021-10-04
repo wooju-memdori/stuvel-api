@@ -289,11 +289,34 @@ router.patch('/password', isLoggedIn, async (req, res) => {
             where: { id: req.user.dataValues.id },
           },
         );
+
         return res.status(200).send('비밀번호 변경 완료');
       },
     )(req, res);
   } catch (err) {
     console.error(err);
+    res.status(500).send(err);
+  }
+});
+
+// 프로필 사진 업로드
+router.patch('/profileimage', upload.single('image'), async (req, res) => {
+  try {
+    console.log('file ::: ', req.file);
+    console.log(req.file.location);
+
+    await User.update(
+      {
+        image: req.file.location,
+      },
+      {
+        where: { id: req.user.dataValues.id },
+      },
+    );
+    res.status(200).send(req.file.location);
+  } catch (err) {
+    console.error(err);
+
     res.status(500).send(err);
   }
 });
