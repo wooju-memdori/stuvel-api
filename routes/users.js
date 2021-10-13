@@ -152,7 +152,14 @@ router.get('/', isLoggedIn, async (req, res) => {
     if (req.user.dataValues.id) {
       const user = await User.findOne({
         where: { id: req.user.dataValues.id },
-        attributes: ['nickname', 'email', 'image', 'gender', 'mobumScore'],
+        attributes: [
+          'nickname',
+          'email',
+          'image',
+          'gender',
+          'mobumScore',
+          'description',
+        ],
       });
       const tags = await UserTag.findAll({
         where: req.user.dataValues.id,
@@ -218,12 +225,13 @@ router.delete('/:id', isLoggedIn, (req, res) => {
     });
 });
 
-// 닉네임 변경
-router.patch('/nickname', isLoggedIn, async (req, res) => {
+// 닉네임 및 소개글 변경
+router.patch('/personal-info', isLoggedIn, async (req, res) => {
   try {
     await User.update(
       {
         nickname: req.body.nickname,
+        description: req.body.description,
       },
       {
         where: { id: req.user.dataValues.id },

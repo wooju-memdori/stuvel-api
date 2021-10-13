@@ -32,6 +32,11 @@ class User extends Sequelize.Model {
           allowNull: false,
           defaultValue: 1,
         },
+        description: {
+          type: Sequelize.STRING(20),
+          allowNull: true,
+          defaultValue: '소개글을 입력해주세요.',
+        },
         mobumScore: {
           field: 'mobum_score',
           type: Sequelize.INTEGER,
