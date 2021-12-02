@@ -32,25 +32,26 @@ router.post(
     try {
       const newSalt = await createSalt();
       const { password } = await createPassword(req.body.password, newSalt);
-      const user = User.create({
+      const user = await User.create({
         email: req.body.email,
         nickname: req.body.nickname,
         gender: req.body.gender,
         password,
         image: req.file?.location,
         salt: newSalt,
-      })
-        .then(result => {
-          console.log('데이터 추가 완료');
-          res.json({ result });
-        })
-        .catch(err => {
-          console.log('데이터 추가 실패');
-          if (err.name === 'SequelizeUniqueConstraintError') {
-            res.status(409).send(failed(err, 409));
-          }
-          res.status(500).send(failed(err));
-        });
+      });
+      if (req.body.tag) {
+        const promisesToRun = req.body.tag.map(tag =>
+          UserTag.create({
+            // userId: req.user.dataValues.id,
+            user_id: user.id,
+            // tagId: +tag,
+            tag_id: +tag,
+          }),
+        );
+        await Promise.all(promisesToRun);
+      }
+      res.send(success(user));
     } catch (err) {
       res.status(500).send(failed(err));
       console.log(err);
