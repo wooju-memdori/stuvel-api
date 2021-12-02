@@ -46,10 +46,13 @@ router.post(
         })
         .catch(err => {
           console.log('데이터 추가 실패');
-          res.json({ err });
+          if (err.name === 'SequelizeUniqueConstraintError') {
+            res.status(409).send(failed(err, 409));
+          }
+          res.status(500).send(failed(err));
         });
     } catch (err) {
-      res.status(500).send(err);
+      res.status(500).send(failed(err));
       console.log(err);
     }
   },
