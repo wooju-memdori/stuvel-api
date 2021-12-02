@@ -58,6 +58,22 @@ router.post(
   },
 );
 
+// 중복 이메일 체크
+router.get('/duplicate-email/:email', isNotLoggedIn, (req, res, next) => {
+  User.findOne({ where: { email: req.params.email } })
+    .then(user => {
+      if (!user) {
+        res.send(success('중복된 이메일이 없습니다.'));
+      } else {
+        res.status(409).send(failed('중복된 이메일이 있습니다.', 409));
+      }
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).send(failed(error));
+    });
+});
+
 // 로그인 (로그아웃상태에서만 접근 가능)
 router.post('/login', isNotLoggedIn, (req, res, next) => {
   try {
